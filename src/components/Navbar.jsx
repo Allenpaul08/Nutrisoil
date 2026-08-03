@@ -23,7 +23,7 @@ const Navbar = () => {
       case '/history': return dict.actHist;
       case '/analytics': return dict.actAnalytics;
       case '/profile': return dict.navProfile;
-      case '/settings': return dict.settHwTitle;
+      case '/settings': return '⚙️ Settings';
       default: return dict.appTitle;
     }
   };

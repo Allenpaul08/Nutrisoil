@@ -101,7 +101,13 @@ const i18n = {
     settHwTitle: 'வன்பொருள் இணைப்பு அமைப்புகள்',
     settEnableLive: 'நேரலை ESP32 இணைப்பை இயக்கு',
     hwDescSim: 'தற்போது மாதிரி சிமுலேஷன் மதிப்புகள் பயன்படுத்தப்படுகின்றன',
-    hwDescLive: 'BLE இணைக்கப்பட்டது (ESP32-NPK-01)'
+    hwDescLive: 'BLE இணைக்கப்பட்டது (ESP32-NPK-01)',
+    settAiTitle: '🤖 AI உரையாடல் அமைப்புகள்',
+    settGroqLabel: 'Groq API விசை',
+    settGroqPlaceholder: 'உங்கள் Groq API விசையை உள்ளிடவும்',
+    settGroqSaved: '✓ API விசை சேமிக்கப்பட்டது',
+    settGroqEmpty: 'API விசை இல்லை — NutriBot இயங்காது',
+    settGroqHelp: 'இலவச API விசையை console.groq.com இல் பெறலாம்'
   },
   en: {
     appTitle: 'NUTRISOIL',
@@ -203,7 +209,13 @@ const i18n = {
     settHwTitle: 'Hardware Connection Settings',
     settEnableLive: 'Enable Live ESP32 Hardware',
     hwDescSim: 'Currently using Prototype Simulated Values',
-    hwDescLive: 'BLE Connected (ESP32-NPK-01)'
+    hwDescLive: 'BLE Connected (ESP32-NPK-01)',
+    settAiTitle: '🤖 AI Chatbot Configuration',
+    settGroqLabel: 'Groq API Key',
+    settGroqPlaceholder: 'Enter your Groq API key (gsk_...)',
+    settGroqSaved: '✓ API key saved',
+    settGroqEmpty: 'No API key set — NutriBot will not work',
+    settGroqHelp: 'Get a free API key at console.groq.com'
   }
 };
 

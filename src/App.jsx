@@ -25,7 +25,7 @@ function App() {
   return (
     <LanguageProvider>
       <HardwareProvider>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <div className="app-container">
             <Navbar />
 

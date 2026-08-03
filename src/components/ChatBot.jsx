@@ -1,170 +1,152 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useHardware } from '../context/HardwareContext';
-import { sendChatMessage } from '../services/api';
+import { sendGroqMessage } from '../services/groqChat';
+
+const GROQ_KEY_STORAGE = 'nutrisoil_groq_api_key';
+
+/* ── Suggested quick-question chips ── */
+const QUICK_PROMPTS_EN = [
+  '🌱 What is my soil score?',
+  '🌾 Best crops for my soil?',
+  '🧪 Fertilizer recommendation?',
+  '💧 Irrigation advice',
+  '🔬 What is soil pH?',
+];
+
+const QUICK_PROMPTS_TA = [
+  '🌱 என் மண் மதிப்பெண் என்ன?',
+  '🌾 சிறந்த பயிர் பரிந்துரை?',
+  '🧪 உர பரிந்துரை',
+  '💧 நீர்ப்பாசன ஆலோசனை',
+  '🔬 மண் pH என்றால் என்ன?',
+];
+
+/* ── Error message resolver ── */
+function getErrorMessage(err, isTa) {
+  if (err.message === 'NO_API_KEY') {
+    return isTa
+      ? `⚙️ Groq API விசை அமைக்கப்படவில்லை.\n\nதயவுசெய்து Settings → AI Configuration இல் உங்கள் Groq API விசையை உள்ளிடவும்.\n\n🔑 console.groq.com இல் இலவசமாக பெறலாம்.`
+      : `⚙️ No Groq API key found.\n\nPlease go to Settings → AI Configuration and enter your Groq API key.\n\n🔑 Get a free key at console.groq.com`;
+  }
+  if (err.message === 'INVALID_API_KEY') {
+    return isTa
+      ? `❌ தவறான API விசை.\n\nSettings இல் சரியான Groq API விசையை உள்ளிடவும்.`
+      : `❌ Invalid API key.\n\nPlease check your Groq API key in Settings.`;
+  }
+  if (err.message === 'RATE_LIMITED') {
+    return isTa
+      ? `⏳ அதிக கோரிக்கைகள். கொஞ்சம் நிறுத்தி மீண்டும் முயற்சிக்கவும்.`
+      : `⏳ Rate limited. Please wait a moment and try again.`;
+  }
+  if (err.message === 'CONTEXT_TOO_LONG') {
+    return isTa
+      ? `⚠️ உரையாடல் மிகவும் நீளமாக உள்ளது. Clear பொத்தானை அழுத்தி மீண்டும் தொடங்கவும்.`
+      : `⚠️ Conversation is too long. Please tap Clear to start a fresh chat.`;
+  }
+  // Log unknown errors for debugging
+  console.error('[NutriBot] Unhandled error:', err.message);
+  return isTa
+    ? `⚠️ பிழை ஏற்பட்டது: ${err.message}\n\nமீண்டும் முயற்சிக்கவும்.`
+    : `⚠️ Error: ${err.message}\n\nPlease try again.`;
+}
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showQuickPrompts, setShowQuickPrompts] = useState(true);
 
   const { currentLang, isTa } = useLanguage();
   const { sensorState, chatHistory, setChatHistory } = useHardware();
   const botBodyRef = useRef(null);
 
-  const getInitialWelcomeMessage = () => {
-    return isTa
-      ? `👋 NutriSoil-க்கு உங்களை வரவேற்கிறோம்!\n\nநான் உங்களுக்கு உதவக்கூடியவை:\n🌾 பயிர் பரிந்துரை\n🧪 உர பரிந்துரை\n🌱 மண் ஆரோக்கியம்\n🍃 நோய் கண்டறிதல்`
-      : `👋 Welcome to NutriSoil!\n\nI can help you with:\n🌾 Crop Recommendation\n🧪 Fertilizer\n🌱 Soil Health\n🍃 Disease Detection`;
-  };
+  const quickPrompts = isTa ? QUICK_PROMPTS_TA : QUICK_PROMPTS_EN;
 
-  // Initialize chat history in Context API if empty
+  const getInitialWelcomeMessage = () =>
+    isTa
+      ? `👋 NutriSoil-க்கு உங்களை வரவேற்கிறோம்!\n\nநான் NutriBot — Groq AI ஆல் இயக்கப்படும் விவசாய உதவியாளர்.\n\n🌾 பயிர் பரிந்துரை\n🧪 உர ஆலோசனை\n🌱 மண் ஆரோக்கியம்\n💧 நீர்ப்பாசனம்\n\nகீழே உள்ள கேள்விகளில் ஒன்றை தேர்வு செய்யுங்கள் அல்லது நேரடியாக கேளுங்கள்!`
+      : `👋 Welcome to NutriSoil!\n\nI'm NutriBot — your AI farming assistant powered by Groq.\n\nI can help you with:\n🌾 Crop Recommendations\n🧪 Fertilizer Advice\n🌱 Soil Health Analysis\n💧 Irrigation Planning\n\nTap a quick question below or ask me anything!`;
+
+  /* Init chat */
   useEffect(() => {
     if (!chatHistory || chatHistory.length === 0) {
       setChatHistory([{ sender: 'bot', text: getInitialWelcomeMessage() }]);
     }
   }, []);
 
-  // Update initial message when language changes (if only initial message present)
+  /* Update welcome message on language change */
   useEffect(() => {
     if (chatHistory && chatHistory.length === 1 && chatHistory[0].sender === 'bot') {
       setChatHistory([{ sender: 'bot', text: getInitialWelcomeMessage() }]);
     }
   }, [currentLang]);
 
-  // Auto scroll to bottom of chat window
+  /* Auto-scroll */
   useEffect(() => {
     if (botBodyRef.current) {
       botBodyRef.current.scrollTop = botBodyRef.current.scrollHeight;
     }
   }, [chatHistory, isOpen, isTyping]);
 
-  const handleSend = async () => {
-    const text = inputVal.trim();
-    if (!text || isTyping) return;
+  /* Hide quick prompts after user sends first message */
+  useEffect(() => {
+    const userMsgCount = (chatHistory || []).filter((m) => m.sender === 'user').length;
+    if (userMsgCount > 0) setShowQuickPrompts(false);
+  }, [chatHistory]);
 
-    // 1. Add User Message to Context API State
-    const userMsg = { sender: 'user', text };
+  const sendMessage = async (text) => {
+    const trimmed = text.trim();
+    if (!trimmed || isTyping) return;
+
+    const apiKey = localStorage.getItem(GROQ_KEY_STORAGE) || '';
+
+    const userMsg = { sender: 'user', text: trimmed };
     setChatHistory((prev) => [...prev, userMsg]);
     setInputVal('');
     setIsTyping(true);
+    setShowQuickPrompts(false);
 
-    // 2. Call Gemini AI / Backend POST /chatbot API
     try {
-      const backendRes = await sendChatMessage(text, currentLang, sensorState);
-      if (backendRes && backendRes.reply) {
-        setIsTyping(false);
-        setChatHistory((prev) => [...prev, { sender: 'bot', text: backendRes.reply }]);
-        return;
-      }
-    } catch (err) {
-      console.warn('Gemini API offline, falling back to local NutriBot logic:', err);
-    }
-
-    // 3. Simulated short typing delay for realistic UX
-    setTimeout(() => {
-      setIsTyping(false);
-      const msg = text.toLowerCase();
-      let reply = '';
-
-      if (
-        msg.includes('hi') ||
-        msg.includes('hello') ||
-        msg.includes('hey') ||
-        msg.includes('வணக்கம்') ||
-        msg.includes('ஹலோ')
-      ) {
-        reply = isTa
-          ? `👋 வணக்கம்! நான் NutriBot.\n\n🌱 மண் ஆரோக்கியம்\n🌾 பயிர் பரிந்துரை\n🧪 உர பரிந்துரை\n💧 நீர்ப்பாசனம்\n🍃 நோய் கண்டறிதல்\n🏛️ அரசு திட்டங்கள்\n\nஇவற்றைப் பற்றி என்னிடம் கேளுங்கள்.`
-          : `👋 Hello! I am NutriBot.\n\nI can help you with:\n\n🌱 Soil Health\n🌾 Crop Recommendation\n🧪 Fertilizer\n💧 Irrigation\n🍃 Disease Detection\n\nAsk me anything!`;
-      } else if (
-        msg.includes('soil') ||
-        msg.includes('மண்') ||
-        msg.includes('soil health') ||
-        msg.includes('score')
-      ) {
-        reply = isTa
-          ? `🌱 உங்கள் Soil Health Score : ${sensorState.score}\n\n✅ மண் நல்ல நிலையில் உள்ளது.\n\n🌾 பொருத்தமான பயிர்கள்:\n• நெல்\n• வாழை\n• கரும்பு`
-          : `🌱 Soil Health Score : ${sensorState.score}\n\n✅ Soil condition is healthy.\n\nRecommended Crops:\n• Paddy\n• Banana\n• Sugarcane`;
-      } else if (
-        msg.includes('crop') ||
-        msg.includes('பயிர்') ||
-        msg.includes('rice') ||
-        msg.includes('paddy') ||
-        msg.includes('banana') ||
-        msg.includes('coconut') ||
-        msg.includes('நெல்')
-      ) {
-        reply = isTa
-          ? `🌾 பரிந்துரைக்கப்படும் பயிர்கள்:\n\n✅ நெல்\n✅ வாழை\n✅ கரும்பு\n\nஉங்கள் மண்ணிற்கு இவை மிகவும் பொருத்தமானவை.`
-          : `🌾 Recommended Crops\n\n✅ Paddy\n✅ Banana\n✅ Sugarcane\n\nThese crops are suitable for your soil.`;
-      } else if (
-        msg.includes('fertilizer') ||
-        msg.includes('fertiliser') ||
-        msg.includes('urea') ||
-        msg.includes('dap') ||
-        msg.includes('உரம்')
-      ) {
-        reply = isTa
-          ? `🧪 உர பரிந்துரை\n\n• யூரியா\n• DAP\n• இயற்கை உரம்\n\nசமநிலை உரத்தை பயன்படுத்துங்கள்.`
-          : `🧪 Fertilizer Recommendation\n\n• Urea\n• DAP\n• Organic Compost\n\nUse balanced fertilizer.`;
-      } else if (
-        msg.includes('water') ||
-        msg.includes('irrigation') ||
-        msg.includes('நீர்') ||
-        msg.includes('நீர்ப்பாசனம்')
-      ) {
-        reply = isTa
-          ? `💧 மண் ஈரப்பதம் : ${sensorState.moisture}%\n\nDrip Irrigation பரிந்துரைக்கப்படுகிறது.`
-          : `💧 Soil Moisture : ${sensorState.moisture}%\n\nDrip irrigation is recommended.`;
-      } else if (
-        msg.includes('disease') ||
-        msg.includes('leaf') ||
-        msg.includes('plant') ||
-        msg.includes('நோய்') ||
-        msg.includes('இலை')
-      ) {
-        reply = isTa
-          ? `🍃 இலை புகைப்படத்தை Upload செய்யுங்கள்.\n\nநான்\n✅ நோய்\n✅ காரணம்\n✅ மருந்து\n✅ தடுப்பு\n\nஎல்லாவற்றையும் கூறுவேன்.`
-          : `🍃 Upload a leaf image.\n\nI will identify\n✅ Disease\n✅ Cause\n✅ Treatment\n✅ Prevention`;
-      } else if (
-        msg.includes('weather') ||
-        msg.includes('temperature') ||
-        msg.includes('climate') ||
-        msg.includes('வானிலை')
-      ) {
-        reply = isTa
-          ? `☀️ வெப்பநிலை : ${sensorState.temperature}°C\n\nமழை வாய்ப்பு இருந்தால் உரம் இடுவதை தவிர்க்கவும்.`
-          : `☀️ Temperature : ${sensorState.temperature}°C\n\nAvoid fertilizer application before heavy rainfall.`;
-      } else if (
-        msg.includes('thanks') ||
-        msg.includes('thank') ||
-        msg.includes('நன்றி')
-      ) {
-        reply = isTa
-          ? `😊 நன்றி!\n\nஉங்கள் விவசாயத்திற்கு வாழ்த்துகள் 🌾`
-          : `😊 You're Welcome!\n\nHappy Farming 🌾`;
-      } else {
-        reply = isTa
-          ? `🤖 மன்னிக்கவும். அந்த கேள்வியை புரிந்து கொள்ள முடியவில்லை.\n\nநீங்கள் கேட்கலாம்:\n🌱 மண்\n🌾 பயிர்\n🧪 உரம்\n💧 நீர்ப்பாசனம்\n🍃 நோய்\n🏛️ அரசு திட்டங்கள்`
-          : `🤖 Sorry! I couldn't understand.\n\nTry asking about:\n🌱 Soil\n🌾 Crop\n🧪 Fertilizer\n💧 Irrigation\n🍃 Disease`;
-      }
-
+      const currentHistory = [...(chatHistory || [])];
+      const reply = await sendGroqMessage(trimmed, sensorState, currentHistory, apiKey);
       setChatHistory((prev) => [...prev, { sender: 'bot', text: reply }]);
-    }, 600);
+    } catch (err) {
+      const errorText = getErrorMessage(err, isTa);
+      setChatHistory((prev) => [...prev, { sender: 'bot', text: errorText, isError: true }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
+  const handleSend = () => sendMessage(inputVal);
+
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSend();
     }
   };
 
+  const handleQuickPrompt = (prompt) => sendMessage(prompt);
+
+  const handleClearChat = () => {
+    setChatHistory([{ sender: 'bot', text: getInitialWelcomeMessage() }]);
+    setShowQuickPrompts(true);
+  };
+
+  const hasApiKey = !!(localStorage.getItem(GROQ_KEY_STORAGE) || '').trim();
+
   return (
     <>
       {/* Floating Chat Button */}
-      <button id="botButton" onClick={() => setIsOpen(!isOpen)} title="NutriBot AI">
-        🤖
+      <button
+        id="botButton"
+        onClick={() => setIsOpen(!isOpen)}
+        title="NutriBot AI"
+        style={{ animation: isOpen ? 'none' : 'botPulse 2.5s infinite ease-in-out' }}
+      >
+        {isOpen ? '✕' : '🤖'}
       </button>
 
       {/* Chat Window */}
@@ -172,8 +154,41 @@ const Chatbot = () => {
         <div id="nutriBot">
           {/* Header */}
           <div id="botHeader">
-            <span>🌱 NutriBot</span>
-            <span onClick={() => setIsOpen(false)}>✖</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '34px', height: '34px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', fontSize: '18px',
+              }}>🌱</div>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px', lineHeight: '1.2' }}>NutriBot</div>
+                <div style={{ fontSize: '10px', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: hasApiKey ? '#86EFAC' : '#FCD34D',
+                    display: 'inline-block',
+                  }} />
+                  {hasApiKey ? 'Groq AI Ready' : 'API key needed'}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <button
+                onClick={handleClearChat}
+                title="Clear chat"
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white',
+                  borderRadius: '8px', padding: '5px 8px', fontSize: '11px',
+                  cursor: 'pointer', fontWeight: '600',
+                }}
+              >
+                Clear
+              </button>
+              <span
+                onClick={() => setIsOpen(false)}
+                style={{ cursor: 'pointer', fontSize: '20px', opacity: 0.85, paddingLeft: '4px' }}
+              >✕</span>
+            </div>
           </div>
 
           {/* Messages Body */}
@@ -182,15 +197,57 @@ const Chatbot = () => {
               <div
                 key={index}
                 className={msg.sender === 'user' ? 'userMessage' : 'botMessage'}
+                style={msg.isError ? {
+                  background: '#FEF2F2', borderColor: '#FCA5A5', color: '#7F1D1D'
+                } : {}}
               >
                 {msg.text}
               </div>
             ))}
 
-            {/* Typing Indicator Animation */}
+            {/* Typing indicator */}
             {isTyping && (
-              <div className="botMessage" style={{ fontStyle: 'italic', color: '#6B7280' }}>
-                NutriBot is typing...
+              <div className="botMessage" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                  NutriBot is thinking
+                </span>
+                <span className="typing-dots">
+                  <span /><span /><span />
+                </span>
+              </div>
+            )}
+
+            {/* Quick prompt chips */}
+            {showQuickPrompts && !isTyping && (
+              <div style={{ marginTop: '8px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px', fontWeight: '600' }}>
+                  {isTa ? 'விரைவு கேள்விகள்:' : 'Quick questions:'}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {quickPrompts.map((prompt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleQuickPrompt(prompt)}
+                      style={{
+                        background: 'white', border: '1.5px solid #C8E6C9',
+                        borderRadius: '12px', padding: '8px 12px',
+                        fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                        color: 'var(--primary-green)', textAlign: 'left',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#F0FDF4';
+                        e.currentTarget.style.borderColor = '#4CAF50';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.borderColor = '#C8E6C9';
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -200,13 +257,21 @@ const Chatbot = () => {
             <input
               type="text"
               id="botInput"
-              placeholder={isTa ? 'எதுவும் கேளுங்கள்...' : 'Ask anything...'}
+              placeholder={isTa ? 'எதுவும் கேளுங்கள்...' : 'Ask anything about your farm...'}
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isTyping}
             />
-            <button onClick={handleSend} disabled={isTyping}>
-              {isTa ? 'அனுப்பு' : 'Send'}
+            <button
+              onClick={handleSend}
+              disabled={isTyping || !inputVal.trim()}
+              style={{
+                opacity: (isTyping || !inputVal.trim()) ? 0.6 : 1,
+                cursor: (isTyping || !inputVal.trim()) ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {isTyping ? '...' : (isTa ? 'அனுப்பு' : 'Send')}
             </button>
           </div>
         </div>
