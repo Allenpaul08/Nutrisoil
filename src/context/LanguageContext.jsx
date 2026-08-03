@@ -222,7 +222,7 @@ const i18n = {
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [currentLang, setCurrentLang] = useState('ta');
+  const [currentLang, setCurrentLang] = useState('en');
 
   const toggleLanguage = () => {
     setCurrentLang((prev) => (prev === 'ta' ? 'en' : 'ta'));
