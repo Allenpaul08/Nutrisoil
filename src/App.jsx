@@ -4,7 +4,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { HardwareProvider } from './context/HardwareContext';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
-import Chatbot from './components/Chatbot';
+import NutriAssistAI from './components/NutriAssistAI';
 
 import Home from './pages/Home';
 import Scan from './pages/Scan';
@@ -46,7 +46,7 @@ function App() {
               </Routes>
             </div>
 
-            <Chatbot />
+            <NutriAssistAI />
             <BottomNav />
           </div>
         </Router>
