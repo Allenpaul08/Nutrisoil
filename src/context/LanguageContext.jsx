@@ -113,7 +113,25 @@ const i18n = {
     settGroqPlaceholder: 'உங்கள் Groq API விசையை உள்ளிடவும்',
     settGroqSaved: '✓ API விசை சேமிக்கப்பட்டது',
     settGroqEmpty: 'API விசை இல்லை — NutriBot இயங்காது',
-    settGroqHelp: 'இலவச API விசையை console.groq.com இல் பெறலாம்'
+    settGroqHelp: 'இலவச API விசையை console.groq.com இல் பெறலாம்',
+
+    // Notifications
+    notifTitle: 'அறிவிப்புகள்',
+    notifNew: 'புதியது',
+    notifMarkRead: 'அனைத்தையும் படித்தது என குறி',
+    notifEmpty: 'அறிவிப்புகள் இல்லை',
+    notif1Title: 'மண் ஈரம் குறைவு',
+    notif1Msg: 'ஈரம் 38% ஆக குறைந்தது — விரைவில் நீர்ப்பாசனம் செய்யுங்கள்.',
+    notif1Time: '2 நிமிடம் முன்',
+    notif2Title: 'நைட்ரஜன் நல்ல நிலையில்',
+    notif2Msg: 'N அளவு 135 mg/kg — ஆரோக்கியமான அளவு.',
+    notif2Time: '1 மணி முன்',
+    notif3Title: 'மண் வெப்பநிலை எச்சரிக்கை',
+    notif3Msg: 'வெப்பநிலை 28.5°C — நெல் வளர்ச்சிக்கு ஏற்றது.',
+    notif3Time: '3 மணி முன்',
+    notif4Title: 'பாஸ்பரஸ் சரிபார்ப்பு',
+    notif4Msg: 'P அளவு 45 mg/kg — பாஸ்பேட் உரம் சேர்க்க பரிசீலிக்கவும்.',
+    notif4Time: 'நேற்று'
   },
   en: {
     appTitle: 'NUTRISOIL',
@@ -227,7 +245,25 @@ const i18n = {
     settGroqPlaceholder: 'Enter your Groq API key (gsk_...)',
     settGroqSaved: '✓ API key saved',
     settGroqEmpty: 'No API key set — NutriBot will not work',
-    settGroqHelp: 'Get a free API key at console.groq.com'
+    settGroqHelp: 'Get a free API key at console.groq.com',
+
+    // Notifications
+    notifTitle: 'Notifications',
+    notifNew: 'new',
+    notifMarkRead: 'Mark all read',
+    notifEmpty: 'No notifications',
+    notif1Title: 'Low Soil Moisture',
+    notif1Msg: 'Moisture dropped to 38% — consider irrigation soon.',
+    notif1Time: '2 min ago',
+    notif2Title: 'Nitrogen Level Optimal',
+    notif2Msg: 'N level is 135 mg/kg — within healthy range.',
+    notif2Time: '1 hr ago',
+    notif3Title: 'Soil Temperature Alert',
+    notif3Msg: 'Temperature at 28.5°C — suitable for paddy growth.',
+    notif3Time: '3 hr ago',
+    notif4Title: 'Phosphorous Check',
+    notif4Msg: 'P level at 45 mg/kg — consider adding phosphate fertilizer.',
+    notif4Time: 'Yesterday'
   }
 };
 

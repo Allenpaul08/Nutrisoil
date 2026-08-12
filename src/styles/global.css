@@ -1364,3 +1364,213 @@ input[type="range"] {
   letter-spacing: 0.3px;
 }
 
+/* ================= NOTIFICATION BELL & PANEL ================= */
+
+/* Red badge on bell */
+.notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #E53935;
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 1.5px solid var(--primary-green);
+  pointer-events: none;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* Backdrop to close panel when clicking outside */
+.notif-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+}
+
+/* Notification panel */
+.notif-panel {
+  position: absolute;
+  top: 56px; /* height of app-bar */
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  animation: notifSlideDown 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes notifSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Panel header */
+.notif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.notif-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.notif-count-chip {
+  background: #E53935;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+.notif-mark-read-btn {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--primary-green);
+  border: none;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notif-mark-read-btn:hover {
+  background: rgba(46, 125, 50, 0.2);
+}
+
+/* Scrollable list */
+.notif-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Individual notification item */
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: #F9FFF9;
+}
+
+/* Unread highlight */
+.notif-item.notif-unread {
+  background: #F0FBF1;
+}
+
+.notif-item.notif-unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary-green);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Icon circle */
+.notif-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Text content */
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-item-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 2px;
+}
+
+.notif-item-msg {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.notif-item-time {
+  font-size: 10px;
+  color: #A0AEC0;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Dismiss (×) button */
+.notif-dismiss-btn {
+  background: none;
+  border: none;
+  color: #CBD5E0;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.notif-dismiss-btn:hover {
+  color: #E53935;
+  background: #FEE2E2;
+}
+
+/* Empty state */
+.notif-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+

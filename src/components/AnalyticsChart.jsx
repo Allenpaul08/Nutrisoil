@@ -15,10 +15,13 @@ const AnalyticsChart = () => {
   const { dict, isTa } = useLanguage();
   const { sensorState } = useHardware();
 
-  const currentScore = parseFloat(sensorState.score) || 84.5;
-  const currentMoisture = parseFloat(sensorState.moisture) || 52.0;
-  const currentPh = parseFloat(sensorState.ph) || 6.8;
-  const currentNitrogen = parseFloat(sensorState.nitrogen) || 135;
+  const currentScore      = parseFloat(sensorState.score)       || 84.5;
+  const currentMoisture   = parseFloat(sensorState.moisture)    || 52.0;
+  const currentPh         = parseFloat(sensorState.ph)          || 6.8;
+  const currentNitrogen   = parseFloat(sensorState.nitrogen)    || 135;
+  const currentPhosphor   = parseFloat(sensorState.phosphorous) || 45;
+  const currentPotassium  = parseFloat(sensorState.potassium)   || 120;
+  const currentTemp       = parseFloat(sensorState.temperature) || 28.5;
 
   const healthData = [
     { name: isTa ? 'வாரம் 1' : 'Week 1', value: 72 },
@@ -50,6 +53,30 @@ const AnalyticsChart = () => {
     { name: isTa ? 'வாரம் 3' : 'Week 3', value: 128 },
     { name: isTa ? 'வாரம் 4' : 'Week 4', value: 130 },
     { name: isTa ? 'இன்று' : 'Today', value: currentNitrogen }
+  ];
+
+  const phosphorousData = [
+    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 30 },
+    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 35 },
+    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 38 },
+    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 42 },
+    { name: isTa ? 'இன்று' : 'Today', value: currentPhosphor }
+  ];
+
+  const potassiumData = [
+    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 95 },
+    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 102 },
+    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 108 },
+    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 115 },
+    { name: isTa ? 'இன்று' : 'Today', value: currentPotassium }
+  ];
+
+  const temperatureData = [
+    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 26.0 },
+    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 27.0 },
+    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 27.5 },
+    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 28.0 },
+    { name: isTa ? 'இன்று' : 'Today', value: currentTemp }
   ];
 
   return (
@@ -177,6 +204,102 @@ const AnalyticsChart = () => {
                 stroke="#388E3C"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#388E3C' }}
+                isAnimationActive={true}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 5. Phosphorous Trend Chart */}
+      <div className="info-card">
+        <div className="info-card-title" style={{ marginBottom: '14px', color: '#C62828' }}>
+          🌸 {isTa ? 'பாஸ்பரஸ் வரைபடம் (Phosphorous Trend)' : 'Phosphorous Trend (mg/kg)'}
+        </div>
+        <div style={{ width: '100%', height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={phosphorousData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#FCE4EC" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={[10, 100]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: '1px solid #F48FB1'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={isTa ? 'பாஸ்பரஸ் (mg/kg)' : 'Phosphorous (mg/kg)'}
+                stroke="#C62828"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#C62828' }}
+                isAnimationActive={true}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 6. Potassium Trend Chart */}
+      <div className="info-card">
+        <div className="info-card-title" style={{ marginBottom: '14px', color: '#283593' }}>
+          🪴 {isTa ? 'பொட்டாசியம் வரைபடம் (Potassium Trend)' : 'Potassium Trend (mg/kg)'}
+        </div>
+        <div style={{ width: '100%', height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={potassiumData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E8EAF6" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={[50, 300]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: '1px solid #9FA8DA'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={isTa ? 'பொட்டாசியம் (mg/kg)' : 'Potassium (mg/kg)'}
+                stroke="#283593"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#283593' }}
+                isAnimationActive={true}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 7. Temperature Trend Chart */}
+      <div className="info-card">
+        <div className="info-card-title" style={{ marginBottom: '14px', color: '#F57F17' }}>
+          🌡️ {isTa ? 'மண் வெப்பநிலை வரைபடம் (Temperature Trend)' : 'Soil Temperature Trend (°C)'}
+        </div>
+        <div style={{ width: '100%', height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={temperatureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#FFF8E1" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={[15, 45]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: '1px solid #FFE082'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={isTa ? 'வெப்பநிலை (°C)' : 'Temperature (°C)'}
+                stroke="#F57F17"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#F57F17' }}
                 isAnimationActive={true}
               />
             </LineChart>
