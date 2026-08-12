@@ -57,6 +57,33 @@ const Home = () => {
           iconBg="#E8F5E9"
           iconColor="#2E7D32"
         />
+
+        <SensorCard
+          title={dict.pTitleP}
+          value={Math.round(sensorState.phosphorous)}
+          unit="mg/kg"
+          icon="spa"
+          iconBg="#FCE4EC"
+          iconColor="#C62828"
+        />
+
+        <SensorCard
+          title={dict.pTitleK}
+          value={Math.round(sensorState.potassium)}
+          unit="mg/kg"
+          icon="potted_plant"
+          iconBg="#E8EAF6"
+          iconColor="#283593"
+        />
+
+        <SensorCard
+          title={dict.pTitleTemp}
+          value={sensorState.temperature.toFixed(1)}
+          unit="°C"
+          icon="thermostat"
+          iconBg="#FFF8E1"
+          iconColor="#F57F17"
+        />
       </div>
 
       {/* Quick Action Modules Section */}

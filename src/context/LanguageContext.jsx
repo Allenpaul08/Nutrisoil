@@ -36,10 +36,16 @@ const i18n = {
     pTitlePh: 'மண் pH',
     pTitleEc: 'மின் கடத்துத்திறன் (EC)',
     pTitleN: 'நைட்ரஜன் (N)',
+    pTitleP: 'பாஸ்பரஸ் (P)',
+    pTitleK: 'பொட்டாசியம் (K)',
+    pTitleTemp: 'மண் வெப்பநிலை',
     simTitle: 'மாதிரி சென்சார் கட்டுப்பாடுகள்',
     sldTitleMoist: 'மண் ஈரம் (%)',
     sldTitlePh: 'மண் pH',
     sldTitleN: 'நைட்ரஜன் (N)',
+    sldTitleP: 'பாஸ்பரஸ் (P)',
+    sldTitleK: 'பொட்டாசியம் (K)',
+    sldTitleTemp: 'மண் வெப்பநிலை (°C)',
     btnRunAi: '🤖 AI பகுப்பாய்வு செய்',
 
     // AI Screen
@@ -144,10 +150,16 @@ const i18n = {
     pTitlePh: 'Soil pH',
     pTitleEc: 'EC Level',
     pTitleN: 'Nitrogen (N)',
+    pTitleP: 'Phosphorous (P)',
+    pTitleK: 'Potassium (K)',
+    pTitleTemp: 'Soil Temperature',
     simTitle: 'Prototype Sensor Controls',
     sldTitleMoist: 'Soil Moisture (%)',
     sldTitlePh: 'Soil pH',
     sldTitleN: 'Nitrogen (N)',
+    sldTitleP: 'Phosphorous (P)',
+    sldTitleK: 'Potassium (K)',
+    sldTitleTemp: 'Soil Temperature (°C)',
     btnRunAi: '🤖 Run AI Diagnostic Analysis',
 
     // AI Screen

@@ -9,6 +9,8 @@ export const HardwareProvider = ({ children }) => {
     temperature: 28.5,
     ph: 6.8,
     nitrogen: 135.0,
+    phosphorous: 45.0,
+    potassium: 120.0,
     ec: 1.35,
     score: '84.5',
     status: 'OPTIMAL'
@@ -28,6 +30,8 @@ export const HardwareProvider = ({ children }) => {
       const moisture = newValues.moisture !== undefined ? parseFloat(newValues.moisture) : prev.moisture;
       const ph = newValues.ph !== undefined ? parseFloat(newValues.ph) : prev.ph;
       const nitrogen = newValues.nitrogen !== undefined ? parseFloat(newValues.nitrogen) : prev.nitrogen;
+      const phosphorous = newValues.phosphorous !== undefined ? parseFloat(newValues.phosphorous) : prev.phosphorous;
+      const potassium = newValues.potassium !== undefined ? parseFloat(newValues.potassium) : prev.potassium;
       const ec = newValues.ec !== undefined ? parseFloat(newValues.ec) : prev.ec;
       const temperature = newValues.temperature !== undefined ? parseFloat(newValues.temperature) : prev.temperature;
 
@@ -61,6 +65,8 @@ export const HardwareProvider = ({ children }) => {
         moisture,
         ph,
         nitrogen,
+        phosphorous,
+        potassium,
         ec,
         temperature,
         score: computedScore,

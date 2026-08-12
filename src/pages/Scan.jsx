@@ -22,13 +22,25 @@ const Scan = () => {
     updateSensors({ nitrogen: e.target.value });
   };
 
+  const handlePhosphorousChange = (e) => {
+    updateSensors({ phosphorous: e.target.value });
+  };
+
+  const handlePotassiumChange = (e) => {
+    updateSensors({ potassium: e.target.value });
+  };
+
+  const handleTemperatureChange = (e) => {
+    updateSensors({ temperature: e.target.value });
+  };
+
   const runAIAnalysis = async () => {
     // Call backend API placeholder, fallback to local summary calculation
     await analyzeSoilAI(sensorState);
 
     const summaryText = isTa
-      ? `மண் சுகாதார மதிப்பெண் <b>${sensorState.score}</b>.<br><br>மண் ஈரம்: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>நைட்ரஜன்: ${sensorState.nitrogen} mg/kg<br><br>மண் நல்ல நிலையில் உள்ளது.`
-      : `Soil Health Score: <b>${sensorState.score}</b><br><br>Moisture: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>Nitrogen: ${sensorState.nitrogen} mg/kg<br><br>Soil condition is healthy.`;
+      ? `மண் சுகாதார மதிப்பெண் <b>${sensorState.score}</b>.<br><br>மண் ஈரம்: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>நைட்ரஜன்: ${sensorState.nitrogen} mg/kg<br><br>பாஸ்பரஸ்: ${Math.round(sensorState.phosphorous)} mg/kg<br><br>பொட்டாசியம்: ${Math.round(sensorState.potassium)} mg/kg<br><br>வெப்பநிலை: ${sensorState.temperature}°C<br><br>மண் நல்ல நிலையில் உள்ளது.`
+      : `Soil Health Score: <b>${sensorState.score}</b><br><br>Moisture: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>Nitrogen: ${sensorState.nitrogen} mg/kg<br><br>Phosphorous: ${Math.round(sensorState.phosphorous)} mg/kg<br><br>Potassium: ${Math.round(sensorState.potassium)} mg/kg<br><br>Temperature: ${sensorState.temperature}°C<br><br>Soil condition is healthy.`;
 
     setAiSummary(summaryText);
     navigate('/ai');
@@ -71,6 +83,33 @@ const Scan = () => {
           icon="eco"
           iconBg="#E8F5E9"
           iconColor="#2E7D32"
+        />
+
+        <SensorCard
+          title={dict.pTitleP}
+          value={Math.round(sensorState.phosphorous)}
+          unit="mg/kg"
+          icon="spa"
+          iconBg="#FCE4EC"
+          iconColor="#C62828"
+        />
+
+        <SensorCard
+          title={dict.pTitleK}
+          value={Math.round(sensorState.potassium)}
+          unit="mg/kg"
+          icon="potted_plant"
+          iconBg="#E8EAF6"
+          iconColor="#283593"
+        />
+
+        <SensorCard
+          title={dict.pTitleTemp}
+          value={sensorState.temperature.toFixed(1)}
+          unit="°C"
+          icon="thermostat"
+          iconBg="#FFF8E1"
+          iconColor="#F57F17"
         />
       </div>
 
@@ -118,6 +157,49 @@ const Scan = () => {
             max="250"
             value={sensorState.nitrogen}
             onChange={handleNitrogenChange}
+          />
+        </div>
+
+        <div className="slider-box">
+          <div className="slider-row">
+            <span>{dict.sldTitleP}</span>
+            <span className="slider-val-badge">{Math.round(sensorState.phosphorous)} mg/kg</span>
+          </div>
+          <input
+            type="range"
+            min="5"
+            max="100"
+            value={sensorState.phosphorous}
+            onChange={handlePhosphorousChange}
+          />
+        </div>
+
+        <div className="slider-box">
+          <div className="slider-row">
+            <span>{dict.sldTitleK}</span>
+            <span className="slider-val-badge">{Math.round(sensorState.potassium)} mg/kg</span>
+          </div>
+          <input
+            type="range"
+            min="20"
+            max="300"
+            value={sensorState.potassium}
+            onChange={handlePotassiumChange}
+          />
+        </div>
+
+        <div className="slider-box">
+          <div className="slider-row">
+            <span>{dict.sldTitleTemp}</span>
+            <span className="slider-val-badge">{sensorState.temperature.toFixed(1)}°C</span>
+          </div>
+          <input
+            type="range"
+            min="10"
+            max="50"
+            step="0.5"
+            value={sensorState.temperature}
+            onChange={handleTemperatureChange}
           />
         </div>
 
