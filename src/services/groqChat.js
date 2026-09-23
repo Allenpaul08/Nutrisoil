@@ -1,9 +1,8 @@
 import { NUTRISOIL_KNOWLEDGE_BASE } from './nutrisoilKnowledge';
 
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-// llama-3.1-8b-instant has 128k context window (vs 8k for llama3-8b-8192)
-// This is required because our RAG system prompt uses ~4000 tokens alone.
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// Routed through the NutriSoil backend — model selection and API key are
+// handled server-side in server/index.js. The key never reaches the browser.
+const CHAT_ENDPOINT = '/api/chat';
 
 /**
  * Build the system prompt by combining the RAG knowledge base
@@ -62,9 +61,7 @@ RESPONSE RULES:
  * @returns {Promise<string>} - The bot's reply text
  */
 export async function sendGroqMessage(userMessage, sensorState, chatHistory = [], apiKey) {
-  if (!apiKey || !apiKey.trim()) {
-    throw new Error('NO_API_KEY');
-  }
+  // apiKey param kept for call-site compatibility — key now lives in server/.env only.
 
   // Build message history for the API (last 6 exchanges = 12 messages max)
   const recentHistory = chatHistory.slice(-12);
@@ -86,39 +83,39 @@ export async function sendGroqMessage(userMessage, sensorState, chatHistory = []
   // Append the new user message
   messages.push({ role: 'user', content: userMessage });
 
+  // Build payload — model is chosen by the backend, not sent from the browser.
   const payload = {
-    model: GROQ_MODEL,
     messages: [
       { role: 'system', content: buildSystemPrompt(sensorState) },
       ...messages,
     ],
     temperature: 0.7,
     max_tokens: 512,
-    top_p: 1,
-    stream: false,
   };
 
-  const response = await fetch(GROQ_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.trim()}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  let response;
+  try {
+    response = await fetch(CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch (netErr) {
+    console.error('[NutriBot] Cannot reach backend:', netErr.message);
+    throw new Error('BACKEND_UNREACHABLE');
+  }
 
   if (!response.ok) {
     const errBody = await response.json().catch(() => ({}));
-    // Log the actual Groq error for easier debugging
-    console.error('[NutriBot] Groq API error:', response.status, JSON.stringify(errBody));
+    console.error('[NutriBot] Backend error:', response.status, JSON.stringify(errBody));
     if (response.status === 401) throw new Error('INVALID_API_KEY');
     if (response.status === 429) throw new Error('RATE_LIMITED');
-    if (errBody?.error?.code === 'context_length_exceeded') throw new Error('CONTEXT_TOO_LONG');
-    throw new Error(errBody?.error?.message || `API_ERROR_${response.status}`);
+    if (errBody?.error === 'CONTEXT_TOO_LONG') throw new Error('CONTEXT_TOO_LONG');
+    throw new Error(errBody?.error || `API_ERROR_${response.status}`);
   }
 
-  const data = await response.json();
-  const reply = data?.choices?.[0]?.message?.content?.trim();
+  const data  = await response.json();
+  const reply = data?.reply?.trim();
 
   if (!reply) throw new Error('EMPTY_RESPONSE');
   return reply;
