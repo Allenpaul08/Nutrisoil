@@ -1,0 +1,81 @@
+{
+  "num_features": 6,
+  "features": [
+    {
+      "name": "N",
+      "description": "Ratio of Nitrogen content in soil",
+      "unit": "kg/ha",
+      "data_type": "float64 / int64",
+      "min_val": 0,
+      "max_val": 140,
+      "order": 1
+    },
+    {
+      "name": "P",
+      "description": "Ratio of Phosphorus content in soil",
+      "unit": "kg/ha",
+      "data_type": "float64 / int64",
+      "min_val": 5,
+      "max_val": 145,
+      "order": 2
+    },
+    {
+      "name": "K",
+      "description": "Ratio of Potassium content in soil",
+      "unit": "kg/ha",
+      "data_type": "float64 / int64",
+      "min_val": 5,
+      "max_val": 205,
+      "order": 3
+    },
+    {
+      "name": "temperature",
+      "description": "Temperature in degree Celsius",
+      "unit": "°C",
+      "data_type": "float64",
+      "min_val": 8.825,
+      "max_val": 43.675,
+      "order": 4
+    },
+    {
+      "name": "humidity",
+      "description": "Relative humidity / Soil Moisture proxy",
+      "unit": "%",
+      "data_type": "float64",
+      "min_val": 14.258,
+      "max_val": 99.982,
+      "order": 5
+    },
+    {
+      "name": "ph",
+      "description": "pH value of the soil",
+      "unit": "pH scale (0-14)",
+      "data_type": "float64",
+      "min_val": 3.504,
+      "max_val": 9.935,
+      "order": 6
+    }
+  ],
+  "excluded_features": [
+    {
+      "name": "rainfall",
+      "reason": "Removed completely to align model directly with real hardware sensors."
+    },
+    {
+      "name": "EC",
+      "reason": "Not present in Kaggle dataset; not added to prevent fabrication."
+    }
+  ],
+  "target": {
+    "name": "label",
+    "description": "Recommended crop category",
+    "num_classes": 22,
+    "classes": [
+      "apple", "banana", "blackgram", "chickpea", "coconut", "coffee", "cotton",
+      "grapes", "jute", "kidneybeans", "lentil", "maize", "mango", "mothbeans",
+      "mungbean", "muskmelon", "orange", "papaya", "pigeonpeas", "pomegranate",
+      "rice", "watermelon"
+    ]
+  },
+  "sensor_hardware_alignment": "Trained using EXACT 6 hardware-available parameters: N, P, K, Temperature, Humidity/Moisture, pH. Rainfall is completely excluded."
+}

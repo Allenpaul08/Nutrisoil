@@ -1,0 +1,1355 @@
+{
+  "architecture": "Two-Path Fertilizer Recommendation Design",
+  "dataset": "fertilizer_recommendation.csv",
+  "rows": 10000,
+  "classes_count": 7,
+  "class_distribution": {
+    "Urea": 3101,
+    "DAP": 2920,
+    "MOP": 1408,
+    "Compost": 996,
+    "Zinc Sulphate": 752,
+    "NPK": 641,
+    "SSP": 182
+  },
+  "dataset_crops": [
+    "Cotton",
+    "Maize",
+    "Potato",
+    "Rice",
+    "Sugarcane",
+    "Tomato",
+    "Wheat"
+  ],
+  "path_a_crop_aware": {
+    "features_count": 8,
+    "features": [
+      "Nitrogen_Level",
+      "Phosphorus_Level",
+      "Potassium_Level",
+      "Soil_pH",
+      "Electrical_Conductivity",
+      "Temperature",
+      "Soil_Moisture",
+      "Crop_Type"
+    ],
+    "selected_model": "Random Forest (Balanced)",
+    "models_performance": {
+      "Random Forest (Balanced)": {
+        "train_accuracy": 0.999125,
+        "test_accuracy": 0.8675,
+        "precision_macro": 0.7442943804068035,
+        "recall_macro": 0.7339943312665281,
+        "f1_macro": 0.7143752947693518,
+        "f1_weighted": 0.8851314939839628,
+        "confusion_matrix": [
+          [
+            155,
+            0,
+            0,
+            42,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            537,
+            0,
+            44,
+            0,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            234,
+            43,
+            1,
+            0,
+            3
+          ],
+          [
+            1,
+            1,
+            0,
+            120,
+            4,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            0,
+            36,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            40,
+            0,
+            578,
+            2
+          ],
+          [
+            2,
+            0,
+            0,
+            35,
+            2,
+            0,
+            111
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.96875,
+            "recall": 0.7788944723618091,
+            "f1-score": 0.8635097493036211,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9981412639405205,
+            "recall": 0.9195205479452054,
+            "f1-score": 0.9572192513368984,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 1.0,
+            "recall": 0.8297872340425532,
+            "f1-score": 0.9069767441860465,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3333333333333333,
+            "recall": 0.9375,
+            "f1-score": 0.4918032786885246,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 1.0,
+            "recall": 0.932258064516129,
+            "f1-score": 0.9649415692821369,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.9098360655737705,
+            "recall": 0.74,
+            "f1-score": 0.8161764705882353,
+            "support": 150.0
+          },
+          "accuracy": 0.8675,
+          "macro avg": {
+            "precision": 0.7442943804068035,
+            "recall": 0.7339943312665281,
+            "f1-score": 0.7143752947693518,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.9284189123219981,
+            "recall": 0.8675,
+            "f1-score": 0.8851314939839628,
+            "support": 2000.0
+          }
+        }
+      },
+      "Extra Trees (Balanced)": {
+        "train_accuracy": 1.0,
+        "test_accuracy": 0.82,
+        "precision_macro": 0.6366742192729974,
+        "recall_macro": 0.6347998649343699,
+        "f1_macro": 0.6352142121965485,
+        "f1_weighted": 0.8125523334992241,
+        "confusion_matrix": [
+          [
+            143,
+            8,
+            9,
+            15,
+            0,
+            18,
+            6
+          ],
+          [
+            6,
+            539,
+            6,
+            18,
+            0,
+            11,
+            4
+          ],
+          [
+            10,
+            6,
+            236,
+            16,
+            0,
+            9,
+            5
+          ],
+          [
+            12,
+            25,
+            16,
+            46,
+            3,
+            15,
+            11
+          ],
+          [
+            4,
+            6,
+            5,
+            10,
+            0,
+            7,
+            5
+          ],
+          [
+            8,
+            12,
+            5,
+            17,
+            0,
+            574,
+            4
+          ],
+          [
+            2,
+            12,
+            8,
+            16,
+            0,
+            10,
+            102
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.772972972972973,
+            "recall": 0.7185929648241206,
+            "f1-score": 0.7447916666666666,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.8865131578947368,
+            "recall": 0.922945205479452,
+            "f1-score": 0.9043624161073825,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.8280701754385965,
+            "recall": 0.8368794326241135,
+            "f1-score": 0.8324514991181657,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3333333333333333,
+            "recall": 0.359375,
+            "f1-score": 0.3458646616541353,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.8913043478260869,
+            "recall": 0.9258064516129032,
+            "f1-score": 0.9082278481012658,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.7445255474452555,
+            "recall": 0.68,
+            "f1-score": 0.710801393728223,
+            "support": 150.0
+          },
+          "accuracy": 0.82,
+          "macro avg": {
+            "precision": 0.6366742192729974,
+            "recall": 0.6347998649343699,
+            "f1-score": 0.6352142121965485,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.8060076448707305,
+            "recall": 0.82,
+            "f1-score": 0.8125523334992241,
+            "support": 2000.0
+          }
+        }
+      },
+      "Decision Tree (Balanced)": {
+        "train_accuracy": 1.0,
+        "test_accuracy": 0.844,
+        "precision_macro": 0.6716155564099917,
+        "recall_macro": 0.6739466278157478,
+        "f1_macro": 0.6723263906664309,
+        "f1_weighted": 0.8471219222006067,
+        "confusion_matrix": [
+          [
+            157,
+            5,
+            3,
+            16,
+            5,
+            7,
+            6
+          ],
+          [
+            4,
+            546,
+            4,
+            17,
+            6,
+            4,
+            3
+          ],
+          [
+            4,
+            5,
+            236,
+            22,
+            3,
+            2,
+            10
+          ],
+          [
+            16,
+            8,
+            13,
+            47,
+            15,
+            11,
+            18
+          ],
+          [
+            3,
+            2,
+            7,
+            12,
+            3,
+            4,
+            6
+          ],
+          [
+            2,
+            4,
+            5,
+            15,
+            6,
+            584,
+            4
+          ],
+          [
+            4,
+            5,
+            4,
+            15,
+            2,
+            5,
+            115
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.8263157894736842,
+            "recall": 0.7889447236180904,
+            "f1-score": 0.8071979434447301,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9495652173913044,
+            "recall": 0.934931506849315,
+            "f1-score": 0.9421915444348576,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.8676470588235294,
+            "recall": 0.8368794326241135,
+            "f1-score": 0.851985559566787,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3263888888888889,
+            "recall": 0.3671875,
+            "f1-score": 0.34558823529411764,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.075,
+            "recall": 0.08108108108108109,
+            "f1-score": 0.07792207792207792,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.946515397082658,
+            "recall": 0.9419354838709677,
+            "f1-score": 0.9442198868229588,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.7098765432098766,
+            "recall": 0.7666666666666667,
+            "f1-score": 0.7371794871794872,
+            "support": 150.0
+          },
+          "accuracy": 0.844,
+          "macro avg": {
+            "precision": 0.6716155564099917,
+            "recall": 0.6739466278157478,
+            "f1-score": 0.6723263906664309,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.8507666025502638,
+            "recall": 0.844,
+            "f1-score": 0.8471219222006067,
+            "support": 2000.0
+          }
+        }
+      },
+      "Logistic Regression (Balanced)": {
+        "train_accuracy": 0.787125,
+        "test_accuracy": 0.768,
+        "precision_macro": 0.6084392763909092,
+        "recall_macro": 0.6364632291437667,
+        "f1_macro": 0.6111604927474807,
+        "f1_weighted": 0.7762224388551717,
+        "confusion_matrix": [
+          [
+            153,
+            4,
+            6,
+            7,
+            13,
+            6,
+            10
+          ],
+          [
+            21,
+            482,
+            30,
+            9,
+            14,
+            13,
+            15
+          ],
+          [
+            16,
+            1,
+            225,
+            8,
+            9,
+            10,
+            13
+          ],
+          [
+            14,
+            6,
+            21,
+            23,
+            34,
+            8,
+            22
+          ],
+          [
+            1,
+            0,
+            7,
+            8,
+            10,
+            3,
+            8
+          ],
+          [
+            19,
+            31,
+            11,
+            9,
+            12,
+            529,
+            9
+          ],
+          [
+            3,
+            0,
+            4,
+            10,
+            16,
+            3,
+            114
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.6740088105726872,
+            "recall": 0.7688442211055276,
+            "f1-score": 0.7183098591549296,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9198473282442748,
+            "recall": 0.8253424657534246,
+            "f1-score": 0.8700361010830325,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.7401315789473685,
+            "recall": 0.7978723404255319,
+            "f1-score": 0.7679180887372014,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3108108108108108,
+            "recall": 0.1796875,
+            "f1-score": 0.22772277227722773,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.09259259259259259,
+            "recall": 0.2702702702702703,
+            "f1-score": 0.13793103448275862,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.9248251748251748,
+            "recall": 0.853225806451613,
+            "f1-score": 0.8875838926174496,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.5968586387434555,
+            "recall": 0.76,
+            "f1-score": 0.6686217008797654,
+            "support": 150.0
+          },
+          "accuracy": 0.768,
+          "macro avg": {
+            "precision": 0.6084392763909092,
+            "recall": 0.6364632291437667,
+            "f1-score": 0.6111604927474807,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.7930829060873078,
+            "recall": 0.768,
+            "f1-score": 0.7762224388551717,
+            "support": 2000.0
+          }
+        }
+      },
+      "Gaussian Naive Bayes": {
+        "train_accuracy": 0.791375,
+        "test_accuracy": 0.7805,
+        "precision_macro": 0.581954374179755,
+        "recall_macro": 0.5773708882423421,
+        "f1_macro": 0.5778106714369244,
+        "f1_weighted": 0.7656770247472058,
+        "confusion_matrix": [
+          [
+            129,
+            18,
+            19,
+            9,
+            0,
+            15,
+            9
+          ],
+          [
+            6,
+            523,
+            6,
+            12,
+            0,
+            29,
+            8
+          ],
+          [
+            8,
+            20,
+            208,
+            12,
+            0,
+            25,
+            9
+          ],
+          [
+            14,
+            16,
+            27,
+            29,
+            0,
+            19,
+            23
+          ],
+          [
+            3,
+            3,
+            8,
+            11,
+            0,
+            6,
+            6
+          ],
+          [
+            10,
+            6,
+            5,
+            12,
+            0,
+            583,
+            4
+          ],
+          [
+            8,
+            14,
+            18,
+            6,
+            0,
+            15,
+            89
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.7247191011235955,
+            "recall": 0.6482412060301508,
+            "f1-score": 0.6843501326259946,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.8716666666666667,
+            "recall": 0.8955479452054794,
+            "f1-score": 0.8834459459459459,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.7147766323024055,
+            "recall": 0.7375886524822695,
+            "f1-score": 0.7260034904013961,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.31868131868131866,
+            "recall": 0.2265625,
+            "f1-score": 0.2648401826484018,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.8424855491329479,
+            "recall": 0.9403225806451613,
+            "f1-score": 0.8887195121951219,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.6013513513513513,
+            "recall": 0.5933333333333334,
+            "f1-score": 0.5973154362416108,
+            "support": 150.0
+          },
+          "accuracy": 0.7805,
+          "macro avg": {
+            "precision": 0.581954374179755,
+            "recall": 0.5773708882423421,
+            "f1-score": 0.5778106714369244,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.7540871983612731,
+            "recall": 0.7805,
+            "f1-score": 0.7656770247472058,
+            "support": 2000.0
+          }
+        }
+      }
+    }
+  },
+  "path_b_soil_only": {
+    "features_count": 7,
+    "features": [
+      "Nitrogen_Level",
+      "Phosphorus_Level",
+      "Potassium_Level",
+      "Soil_pH",
+      "Electrical_Conductivity",
+      "Temperature",
+      "Soil_Moisture"
+    ],
+    "selected_model": "Random Forest (Balanced)",
+    "models_performance": {
+      "Random Forest (Balanced)": {
+        "train_accuracy": 0.9985,
+        "test_accuracy": 0.8655,
+        "precision_macro": 0.7531101216108153,
+        "recall_macro": 0.73009193236727,
+        "f1_macro": 0.7157322840232448,
+        "f1_weighted": 0.8861817263669807,
+        "confusion_matrix": [
+          [
+            154,
+            0,
+            0,
+            42,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            537,
+            0,
+            45,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            234,
+            45,
+            3,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            118,
+            6,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            0,
+            36,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            40,
+            1,
+            578,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            36,
+            4,
+            0,
+            110
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.9808917197452229,
+            "recall": 0.7738693467336684,
+            "f1-score": 0.8651685393258427,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 1.0,
+            "recall": 0.9195205479452054,
+            "f1-score": 0.9580731489741302,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 1.0,
+            "recall": 0.8297872340425532,
+            "f1-score": 0.9069767441860465,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3259668508287293,
+            "recall": 0.921875,
+            "f1-score": 0.4816326530612245,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 1.0,
+            "recall": 0.932258064516129,
+            "f1-score": 0.9649415692821369,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.9649122807017544,
+            "recall": 0.7333333333333333,
+            "f1-score": 0.8333333333333334,
+            "support": 150.0
+          },
+          "accuracy": 0.8655,
+          "macro avg": {
+            "precision": 0.7531101216108153,
+            "recall": 0.73009193236727,
+            "f1-score": 0.7157322840232448,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.93382902562032,
+            "recall": 0.8655,
+            "f1-score": 0.8861817263669807,
+            "support": 2000.0
+          }
+        }
+      },
+      "Extra Trees (Balanced)": {
+        "train_accuracy": 1.0,
+        "test_accuracy": 0.846,
+        "precision_macro": 0.6756312511311686,
+        "recall_macro": 0.6809771510632455,
+        "f1_macro": 0.6734394384228322,
+        "f1_weighted": 0.8462616096493588,
+        "confusion_matrix": [
+          [
+            148,
+            9,
+            5,
+            29,
+            0,
+            6,
+            2
+          ],
+          [
+            6,
+            541,
+            5,
+            20,
+            1,
+            6,
+            5
+          ],
+          [
+            6,
+            4,
+            239,
+            21,
+            0,
+            6,
+            6
+          ],
+          [
+            6,
+            18,
+            12,
+            76,
+            0,
+            4,
+            12
+          ],
+          [
+            3,
+            4,
+            5,
+            17,
+            0,
+            5,
+            3
+          ],
+          [
+            3,
+            5,
+            5,
+            26,
+            0,
+            580,
+            1
+          ],
+          [
+            3,
+            6,
+            4,
+            23,
+            0,
+            6,
+            108
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.8457142857142858,
+            "recall": 0.7437185929648241,
+            "f1-score": 0.7914438502673797,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9216354344122658,
+            "recall": 0.9263698630136986,
+            "f1-score": 0.92399658411614,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.8690909090909091,
+            "recall": 0.8475177304964538,
+            "f1-score": 0.8581687612208259,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.3584905660377358,
+            "recall": 0.59375,
+            "f1-score": 0.4470588235294118,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.9461663947797716,
+            "recall": 0.9354838709677419,
+            "f1-score": 0.9407948094079481,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.7883211678832117,
+            "recall": 0.72,
+            "f1-score": 0.7526132404181185,
+            "support": 150.0
+          },
+          "accuracy": 0.846,
+          "macro avg": {
+            "precision": 0.6756312511311686,
+            "recall": 0.6809771510632455,
+            "f1-score": 0.6734394384228322,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.8511870026581564,
+            "recall": 0.846,
+            "f1-score": 0.8462616096493588,
+            "support": 2000.0
+          }
+        }
+      },
+      "Decision Tree (Balanced)": {
+        "train_accuracy": 1.0,
+        "test_accuracy": 0.847,
+        "precision_macro": 0.6918609342737574,
+        "recall_macro": 0.6911387601895432,
+        "f1_macro": 0.690890313510631,
+        "f1_weighted": 0.8507701816827994,
+        "confusion_matrix": [
+          [
+            157,
+            6,
+            4,
+            17,
+            6,
+            6,
+            3
+          ],
+          [
+            9,
+            542,
+            5,
+            13,
+            4,
+            6,
+            5
+          ],
+          [
+            6,
+            3,
+            240,
+            18,
+            8,
+            4,
+            3
+          ],
+          [
+            12,
+            11,
+            13,
+            53,
+            13,
+            12,
+            14
+          ],
+          [
+            4,
+            6,
+            2,
+            12,
+            6,
+            5,
+            2
+          ],
+          [
+            5,
+            6,
+            5,
+            14,
+            4,
+            583,
+            3
+          ],
+          [
+            3,
+            3,
+            5,
+            18,
+            6,
+            2,
+            113
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.8010204081632653,
+            "recall": 0.7889447236180904,
+            "f1-score": 0.7949367088607595,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9393414211438474,
+            "recall": 0.928082191780822,
+            "f1-score": 0.9336778639104221,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.8759124087591241,
+            "recall": 0.851063829787234,
+            "f1-score": 0.8633093525179856,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.36551724137931035,
+            "recall": 0.4140625,
+            "f1-score": 0.3882783882783883,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.1276595744680851,
+            "recall": 0.16216216216216217,
+            "f1-score": 0.14285714285714285,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.9433656957928802,
+            "recall": 0.9403225806451613,
+            "f1-score": 0.9418416801292407,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.7902097902097902,
+            "recall": 0.7533333333333333,
+            "f1-score": 0.7713310580204779,
+            "support": 150.0
+          },
+          "accuracy": 0.847,
+          "macro avg": {
+            "precision": 0.6918609342737574,
+            "recall": 0.6911387601895432,
+            "f1-score": 0.690890313510631,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.8549567807587474,
+            "recall": 0.847,
+            "f1-score": 0.8507701816827994,
+            "support": 2000.0
+          }
+        }
+      },
+      "Logistic Regression (Balanced)": {
+        "train_accuracy": 0.786,
+        "test_accuracy": 0.7685,
+        "precision_macro": 0.6059563964218512,
+        "recall_macro": 0.6379576374738721,
+        "f1_macro": 0.6094875816430968,
+        "f1_weighted": 0.7745146244024894,
+        "confusion_matrix": [
+          [
+            153,
+            4,
+            6,
+            8,
+            12,
+            5,
+            11
+          ],
+          [
+            22,
+            483,
+            30,
+            9,
+            12,
+            14,
+            14
+          ],
+          [
+            15,
+            1,
+            226,
+            8,
+            10,
+            9,
+            13
+          ],
+          [
+            11,
+            7,
+            20,
+            20,
+            35,
+            8,
+            27
+          ],
+          [
+            3,
+            0,
+            6,
+            6,
+            11,
+            4,
+            7
+          ],
+          [
+            19,
+            33,
+            9,
+            8,
+            11,
+            530,
+            10
+          ],
+          [
+            5,
+            1,
+            5,
+            8,
+            13,
+            4,
+            114
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.6710526315789473,
+            "recall": 0.7688442211055276,
+            "f1-score": 0.7166276346604216,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.9130434782608695,
+            "recall": 0.827054794520548,
+            "f1-score": 0.8679245283018868,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.7483443708609272,
+            "recall": 0.8014184397163121,
+            "f1-score": 0.773972602739726,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.29850746268656714,
+            "recall": 0.15625,
+            "f1-score": 0.20512820512820512,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.10576923076923077,
+            "recall": 0.2972972972972973,
+            "f1-score": 0.15602836879432624,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.9233449477351916,
+            "recall": 0.8548387096774194,
+            "f1-score": 0.8877721943048577,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.5816326530612245,
+            "recall": 0.76,
+            "f1-score": 0.6589595375722543,
+            "support": 150.0
+          },
+          "accuracy": 0.7685,
+          "macro avg": {
+            "precision": 0.6059563964218512,
+            "recall": 0.6379576374738721,
+            "f1-score": 0.6094875816430968,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.789815579944342,
+            "recall": 0.7685,
+            "f1-score": 0.7745146244024894,
+            "support": 2000.0
+          }
+        }
+      },
+      "Gaussian Naive Bayes": {
+        "train_accuracy": 0.791375,
+        "test_accuracy": 0.78,
+        "precision_macro": 0.5822178103079227,
+        "recall_macro": 0.5767353972176638,
+        "f1_macro": 0.5776136776543307,
+        "f1_weighted": 0.7650806324166112,
+        "confusion_matrix": [
+          [
+            131,
+            18,
+            15,
+            10,
+            0,
+            17,
+            8
+          ],
+          [
+            5,
+            520,
+            6,
+            13,
+            0,
+            31,
+            9
+          ],
+          [
+            8,
+            16,
+            211,
+            10,
+            0,
+            30,
+            7
+          ],
+          [
+            16,
+            18,
+            25,
+            29,
+            0,
+            17,
+            23
+          ],
+          [
+            3,
+            3,
+            9,
+            9,
+            0,
+            6,
+            7
+          ],
+          [
+            11,
+            6,
+            5,
+            11,
+            0,
+            583,
+            4
+          ],
+          [
+            7,
+            13,
+            19,
+            9,
+            0,
+            16,
+            86
+          ]
+        ],
+        "per_class_performance": {
+          "Compost": {
+            "precision": 0.7237569060773481,
+            "recall": 0.6582914572864321,
+            "f1-score": 0.6894736842105263,
+            "support": 199.0
+          },
+          "DAP": {
+            "precision": 0.8754208754208754,
+            "recall": 0.8904109589041096,
+            "f1-score": 0.8828522920203735,
+            "support": 584.0
+          },
+          "MOP": {
+            "precision": 0.7275862068965517,
+            "recall": 0.74822695035461,
+            "f1-score": 0.7377622377622378,
+            "support": 282.0
+          },
+          "NPK": {
+            "precision": 0.31868131868131866,
+            "recall": 0.2265625,
+            "f1-score": 0.2648401826484018,
+            "support": 128.0
+          },
+          "SSP": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 37.0
+          },
+          "Urea": {
+            "precision": 0.8328571428571429,
+            "recall": 0.9403225806451613,
+            "f1-score": 0.8833333333333333,
+            "support": 620.0
+          },
+          "Zinc Sulphate": {
+            "precision": 0.5972222222222222,
+            "recall": 0.5733333333333334,
+            "f1-score": 0.5850340136054422,
+            "support": 150.0
+          },
+          "accuracy": 0.78,
+          "macro avg": {
+            "precision": 0.5822178103079227,
+            "recall": 0.5767353972176638,
+            "f1-score": 0.5776136776543307,
+            "support": 2000.0
+          },
+          "weighted avg": {
+            "precision": 0.7535993482979909,
+            "recall": 0.78,
+            "f1-score": 0.7650806324166112,
+            "support": 2000.0
+          }
+        }
+      }
+    }
+  }
+}

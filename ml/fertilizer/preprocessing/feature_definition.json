@@ -1,0 +1,106 @@
+{
+  "architecture": "Two-Path Fertilizer Recommendation Design",
+  "path_a_crop_aware": {
+    "model_type": "Crop-Aware Fertilizer Recommendation Model",
+    "features_count": 8,
+    "features": [
+      {
+        "name": "Nitrogen_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 49 (N)"
+      },
+      {
+        "name": "Phosphorus_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 50 (P)"
+      },
+      {
+        "name": "Potassium_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 51 (K)"
+      },
+      {
+        "name": "Soil_pH",
+        "unit": "pH scale (0-14)",
+        "hardware_mapping": "Register 52 (pH)"
+      },
+      {
+        "name": "Electrical_Conductivity",
+        "unit": "dS/m",
+        "hardware_mapping": "Register 53 (EC)"
+      },
+      {
+        "name": "Temperature",
+        "unit": "°C",
+        "hardware_mapping": "Register 65 (Temperature)"
+      },
+      {
+        "name": "Soil_Moisture",
+        "unit": "%",
+        "hardware_mapping": "Register 55 (Soil Moisture)"
+      },
+      {
+        "name": "Crop_Type",
+        "unit": "Categorical string",
+        "source": "Output from Crop ML Model (Supported crops only)"
+      }
+    ],
+    "supported_dataset_crops": ["Cotton", "Maize", "Potato", "Rice", "Sugarcane", "Tomato", "Wheat"]
+  },
+  "path_b_soil_only": {
+    "model_type": "Soil-Only Fertilizer Recommendation Model",
+    "features_count": 7,
+    "features": [
+      {
+        "name": "Nitrogen_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 49 (N)"
+      },
+      {
+        "name": "Phosphorus_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 50 (P)"
+      },
+      {
+        "name": "Potassium_Level",
+        "unit": "kg/ha",
+        "hardware_mapping": "Register 51 (K)"
+      },
+      {
+        "name": "Soil_pH",
+        "unit": "pH scale (0-14)",
+        "hardware_mapping": "Register 52 (pH)"
+      },
+      {
+        "name": "Electrical_Conductivity",
+        "unit": "dS/m",
+        "hardware_mapping": "Register 53 (EC)"
+      },
+      {
+        "name": "Temperature",
+        "unit": "°C",
+        "hardware_mapping": "Register 65 (Temperature)"
+      },
+      {
+        "name": "Soil_Moisture",
+        "unit": "%",
+        "hardware_mapping": "Register 55 (Soil Moisture)"
+      }
+    ],
+    "usage_trigger": "Triggered when Crop ML output is an unsupported crop category not present in the fertilizer training dataset."
+  },
+  "inference_routing_logic": {
+    "step_1": "Receive Crop ML output crop name and 7 live ESP32 soil parameters.",
+    "step_2": "Audit crop name against supported dataset crops (Cotton, Maize, Potato, Rice, Sugarcane, Tomato, Wheat).",
+    "step_3": "If crop is supported -> Route to Path A (Crop-Aware Model) -> Report recommendation_mode='crop-aware' and crop_support_status='supported'.",
+    "step_4": "If crop is unsupported -> Route to Path B (Soil-Only Model) -> Report recommendation_mode='soil-only' and crop_support_status='unsupported' with explicit soil-nutrient recommendation notice."
+  },
+  "excluded_features": [
+    "Humidity", "Rainfall", "Organic_Carbon", "Soil_Type", "Crop_Growth_Stage",
+    "Season", "Previous_Crop", "Region", "Irrigation_Type", "Fertilizer_Used_Last_Season", "Yield_Last_Season"
+  ],
+  "target": {
+    "name": "Recommended_Fertilizer",
+    "classes": ["Compost", "DAP", "MOP", "NPK", "SSP", "Urea", "Zinc Sulphate"]
+  }
+}
