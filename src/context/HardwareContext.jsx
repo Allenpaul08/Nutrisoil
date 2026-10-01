@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getCropRecommendations, getFertilizerAdvice } from '../services/api';
 
 const HardwareContext = createContext();
 
@@ -20,7 +21,59 @@ export const HardwareProvider = ({ children }) => {
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [selectedSoilType, setSelectedSoilType] = useState('');
   const [soilAnalysisResult, setSoilAnalysisResult] = useState(null);
+  const [mlResult, setMlResult] = useState({
+    crop: null,
+    cropConfidence: null,
+    fertilizer: null,
+    fertilizerConfidence: null,
+    fertilizerPath: null
+  });
   const [chatHistory, setChatHistory] = useState([]);
+
+  // Fetch Crop & Fertilizer ML recommendations when sensorState changes
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchMlRecommendations = async () => {
+      try {
+        const [cropRes, fertRes] = await Promise.all([
+          getCropRecommendations(sensorState),
+          getFertilizerAdvice(sensorState)
+        ]);
+
+        if (!isMounted) return;
+
+        if (cropRes && cropRes.success && fertRes && fertRes.success) {
+          const cropData = cropRes.data || {};
+          const fertData = fertRes.data || {};
+
+          setMlResult({
+            crop: cropData.crop || cropData.recommended_crop || cropData.prediction || null,
+            cropConfidence: cropData.cropConfidence || cropData.confidence || cropData.probability || null,
+            fertilizer: fertData.fertilizer || fertData.recommended_fertilizer || fertData.prediction || null,
+            fertilizerConfidence: fertData.fertilizerConfidence || fertData.confidence || fertData.probability || null,
+            fertilizerPath: fertData.fertilizerPath || fertData.path || fertData.recommendation_path || null
+          });
+        }
+      } catch (error) {
+        console.error('[HardwareContext] ML recommendation fetch error:', error);
+      }
+    };
+
+    fetchMlRecommendations();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    sensorState.moisture,
+    sensorState.temperature,
+    sensorState.ph,
+    sensorState.nitrogen,
+    sensorState.phosphorous,
+    sensorState.potassium,
+    sensorState.ec
+  ]);
 
   // Calculate Soil Health Score & Dynamic AI Recommendation
   const updateSensors = (newValues) => {
@@ -94,6 +147,8 @@ export const HardwareProvider = ({ children }) => {
         setSelectedSoilType,
         soilAnalysisResult,
         setSoilAnalysisResult,
+        mlResult,
+        setMlResult,
         chatHistory,
         setChatHistory
       }}

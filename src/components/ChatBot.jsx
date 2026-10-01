@@ -58,7 +58,7 @@ const Chatbot = () => {
   const [showQuickPrompts, setShowQuickPrompts] = useState(true);
 
   const { currentLang, isTa } = useLanguage();
-  const { sensorState, chatHistory, setChatHistory } = useHardware();
+  const { sensorState, mlResult, chatHistory, setChatHistory } = useHardware();
   const botBodyRef = useRef(null);
 
   const quickPrompts = isTa ? QUICK_PROMPTS_TA : QUICK_PROMPTS_EN;
@@ -109,7 +109,7 @@ const Chatbot = () => {
 
     try {
       const currentHistory = [...(chatHistory || [])];
-      const reply = await sendGroqMessage(trimmed, sensorState, currentHistory, apiKey);
+      const reply = await sendGroqMessage(trimmed, sensorState, currentHistory, apiKey, mlResult);
       setChatHistory((prev) => [...prev, { sender: 'bot', text: reply }]);
     } catch (err) {
       const errorText = getErrorMessage(err, isTa);

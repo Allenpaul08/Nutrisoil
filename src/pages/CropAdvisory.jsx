@@ -6,7 +6,15 @@ import CropCard from '../components/CropCard';
 
 const CropAdvisory = () => {
   const { isTa } = useLanguage();
-  const { sensorState } = useHardware();
+  const { sensorState, mlResult } = useHardware();
+
+  const formattedCropName = mlResult?.crop
+    ? (isTa ? `${mlResult.crop} (ML)` : mlResult.crop.charAt(0).toUpperCase() + mlResult.crop.slice(1))
+    : (isTa ? 'நெல் (Paddy / Rice)' : 'Paddy (Rice)');
+
+  const primaryMatchRate = (mlResult?.cropConfidence !== null && mlResult?.cropConfidence !== undefined)
+    ? `${Math.round(mlResult.cropConfidence * 100)}% Match`
+    : '95% Match';
 
   return (
     <div className="screen active" id="crop-screen">
@@ -18,10 +26,10 @@ const CropAdvisory = () => {
         <span>{isTa ? 'பரிந்துரைக்கப்படும் பயிர்கள்' : 'Recommended Crops'}</span>
       </div>
 
-      {/* Crop Card 1 - Paddy (Rice) */}
+      {/* Crop Card 1 - Paddy (Rice) / Primary ML Recommendation */}
       <CropCard
-        cropName={isTa ? 'நெல் (Paddy / Rice)' : 'Paddy (Rice)'}
-        matchRate="95% Match"
+        cropName={formattedCropName}
+        matchRate={primaryMatchRate}
         yieldText={isTa ? '2.8 - 3.2 டன் / ஏக்கர்' : '2.8 - 3.2 Tons / Acre'}
         weatherText={isTa ? '28.5°C • அதிக ஈரப்பதம் உகந்தது' : '28.5°C • High Humidity Compatible'}
         waterText={isTa ? '6,500 லிட்டர் / ஏக்கர் (சொட்டுநீர்)' : '6,500 Liters / Acre (Drip Irrigation)'}

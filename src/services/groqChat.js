@@ -8,7 +8,7 @@ const CHAT_ENDPOINT = '/api/chat';
  * Build the system prompt by combining the RAG knowledge base
  * with the current live sensor state.
  */
-function buildSystemPrompt(sensorState) {
+function buildSystemPrompt(sensorState, mlResult) {
   const sensorContext = `
 === CURRENT LIVE SENSOR READINGS (from the user's farm right now) ===
 - Soil Moisture: ${sensorState?.moisture ?? 'N/A'}%
@@ -20,9 +20,36 @@ function buildSystemPrompt(sensorState) {
 ===
 `;
 
+  const cropConfStr = (mlResult?.cropConfidence !== null && mlResult?.cropConfidence !== undefined)
+    ? `${Math.round(mlResult.cropConfidence * 100)}%`
+    : 'N/A';
+
+  const fertConfStr = (mlResult?.fertilizerConfidence !== null && mlResult?.fertilizerConfidence !== undefined)
+    ? `${Math.round(mlResult.fertilizerConfidence * 100)}%`
+    : 'N/A';
+
+  let pathModeStr = 'N/A';
+  if (mlResult?.fertilizerPath === 'crop-aware') {
+    pathModeStr = 'Path A: Crop-Aware Model';
+  } else if (mlResult?.fertilizerPath === 'soil-only') {
+    pathModeStr = 'Path B: Soil-Only Model';
+  }
+
+  const mlContext = `
+=== CURRENT REAL-TIME ML PREDICTIONS ===
+- Recommended Crop: ${mlResult?.crop ?? 'N/A'}
+- Crop Confidence: ${cropConfStr}
+- Recommended Fertilizer: ${mlResult?.fertilizer ?? 'N/A'}
+- Fertilizer Confidence: ${fertConfStr}
+- Fertilizer Recommendation Path: ${pathModeStr}
+===
+`;
+
   return `${NUTRISOIL_KNOWLEDGE_BASE}
 
 ${sensorContext}
+
+${mlContext}
 
 You are NutriAssist AI, an expert multilingual AI assistant embedded in the NutriSoil smart farming app. You assist Tamil Nadu farmers (primarily Thanjavur, Pollachi, Coimbatore regions) with:
 - All questions about the NutriSoil app pages and features
@@ -47,7 +74,7 @@ RESPONSE RULES:
 - Lead with the most important recommendation first
 - Use emojis sparingly to make responses friendly
 - Format with line breaks for readability — avoid long paragraphs
-- When recommending crops or fertilizers, always explain WHY based on current sensor values
+- When recommending crops or fertilizers, explain WHY based on current sensor values; distinguish statistical ML model outputs from agronomic causal explanations
 - Keep voice-friendly responses under 100 words when possible`;
 }
 
@@ -58,9 +85,10 @@ RESPONSE RULES:
  * @param {object} sensorState - Current sensor readings from HardwareContext
  * @param {Array}  chatHistory - Recent chat history [{sender, text}, ...]
  * @param {string} apiKey - Groq API key from localStorage
+ * @param {object} mlResult - Current real-time ML results from HardwareContext
  * @returns {Promise<string>} - The bot's reply text
  */
-export async function sendGroqMessage(userMessage, sensorState, chatHistory = [], apiKey) {
+export async function sendGroqMessage(userMessage, sensorState, chatHistory = [], apiKey, mlResult) {
   // apiKey param kept for call-site compatibility — key now lives in server/.env only.
 
   // Build message history for the API (last 6 exchanges = 12 messages max)
@@ -86,7 +114,7 @@ export async function sendGroqMessage(userMessage, sensorState, chatHistory = []
   // Build payload — model is chosen by the backend, not sent from the browser.
   const payload = {
     messages: [
-      { role: 'system', content: buildSystemPrompt(sensorState) },
+      { role: 'system', content: buildSystemPrompt(sensorState, mlResult) },
       ...messages,
     ],
     temperature: 0.7,

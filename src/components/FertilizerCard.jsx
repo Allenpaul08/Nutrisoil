@@ -4,16 +4,35 @@ import { useHardware } from '../context/HardwareContext';
 
 const FertilizerCard = () => {
   const { dict, isTa } = useLanguage();
-  const { sensorState } = useHardware();
+  const { sensorState, mlResult } = useHardware();
 
   const scoreNum = parseFloat(sensorState.score) || 84.5;
+
+  const fertName = mlResult?.fertilizer || dict.fertName;
+
+  let pathInfo = '';
+  if (mlResult?.fertilizerPath === 'crop-aware') {
+    pathInfo = 'Path A: Crop-Aware';
+  } else if (mlResult?.fertilizerPath === 'soil-only') {
+    pathInfo = 'Path B: Soil-Only';
+  }
+
+  const confidencePct = (mlResult?.fertilizerConfidence !== null && mlResult?.fertilizerConfidence !== undefined)
+    ? `${Math.round(mlResult.fertilizerConfidence * 100)}%`
+    : null;
+
+  const metaSubtitle = [pathInfo, confidencePct ? `Confidence: ${confidencePct}` : '']
+    .filter(Boolean)
+    .join(' • ');
 
   return (
     <div>
       {/* Targeted Fertilizer Banner */}
       <div className="info-card" style={{ background: 'linear-gradient(135deg, #1E88E5, #1565C0)', color: 'white', marginBottom: '14px' }}>
-        <div style={{ fontSize: '12px', opacity: 0.9 }}>{dict.fertRecipeHeader}</div>
-        <div style={{ fontSize: '20px', fontWeight: '800', margin: '6px 0' }}>{dict.fertName}</div>
+        <div style={{ fontSize: '12px', opacity: 0.9 }}>
+          {dict.fertRecipeHeader}{metaSubtitle ? ` (${metaSubtitle})` : ''}
+        </div>
+        <div style={{ fontSize: '20px', fontWeight: '800', margin: '6px 0' }}>{fertName}</div>
         <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--accent-gold)' }}>{dict.fertQty}</div>
       </div>
 
