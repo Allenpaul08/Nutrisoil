@@ -51,7 +51,7 @@ const FertilizerCard = () => {
             <span className="param-title">{isTa ? 'பாஸ்பரஸ் (P)' : 'Phosphorus (P)'}</span>
             <span className="material-symbols-outlined param-icon" style={{ background: '#FFF3E0', color: '#E65100' }}>grain</span>
           </div>
-          <div className="param-val">45 <span className="param-unit">mg/kg</span></div>
+          <div className="param-val">{Math.round(sensorState.phosphorus ?? sensorState.phosphorous ?? 0)} <span className="param-unit">mg/kg</span></div>
         </div>
 
         <div className="param-card">
@@ -59,7 +59,7 @@ const FertilizerCard = () => {
             <span className="param-title">{isTa ? 'பொட்டாசியம் (K)' : 'Potassium (K)'}</span>
             <span className="material-symbols-outlined param-icon" style={{ background: '#E3F2FD', color: '#1976D2' }}>science</span>
           </div>
-          <div className="param-val">180 <span className="param-unit">mg/kg</span></div>
+          <div className="param-val">{Math.round(sensorState.potassium ?? 0)} <span className="param-unit">mg/kg</span></div>
         </div>
 
         <div className="param-card">

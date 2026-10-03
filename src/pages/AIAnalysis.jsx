@@ -7,7 +7,7 @@ import RecommendationCard from '../components/RecommendationCard';
 
 const AIAnalysis = () => {
   const { dict, isTa } = useLanguage();
-  const { sensorState, aiSummary } = useHardware();
+  const { sensorState, aiSummary, mlResult } = useHardware();
 
   const scoreNum = parseFloat(sensorState.score) || 84.5;
 
@@ -16,12 +16,23 @@ const AIAnalysis = () => {
   // 60 - 79: Moderate Recommendation
   // Below 60: Critical Recommendation
   const getRecommendationDetails = () => {
+    let mlAddon = '';
+    if (mlResult?.crop || mlResult?.fertilizer) {
+      const cropStr = mlResult?.crop
+        ? (isTa ? `பயிர்: ${mlResult.crop}` : `Crop: ${mlResult.crop.charAt(0).toUpperCase() + mlResult.crop.slice(1)}`)
+        : '';
+      const fertStr = mlResult?.fertilizer
+        ? (isTa ? `உரம்: ${mlResult.fertilizer}` : `Fertilizer: ${mlResult.fertilizer}`)
+        : '';
+      mlAddon = [cropStr, fertStr].filter(Boolean).join(' • ');
+    }
+
     if (scoreNum >= 80) {
       return {
         title: isTa ? 'AI பரிந்துரை: சிறந்த மண் நிலை' : 'AI Recommendation: Excellent Soil Condition',
-        description: isTa
+        description: (isTa
           ? 'மண் ஊட்டச்சத்து நிலைகள் மிகச் சிறந்த அளவில் உள்ளன. தற்போதைய இயற்கை உரமிடுதல் மற்றும் சொட்டுநீர் பாசன முறையை தொடரவும்.'
-          : 'Soil nutrient levels are in excellent range. Continue current organic fertilization routine and precision drip irrigation.',
+          : 'Soil nutrient levels are in excellent range. Continue current organic fertilization routine and precision drip irrigation.') + (mlAddon ? `\n\n[Live ML Advice] ${mlAddon}` : ''),
         badge: isTa ? 'சிறந்த நிலை' : 'Excellent',
         icon: 'verified',
         iconColor: '#2E7D32',
@@ -32,9 +43,9 @@ const AIAnalysis = () => {
     } else if (scoreNum >= 60) {
       return {
         title: isTa ? 'AI பரிந்துரை: மிதமான மண் நிலை' : 'AI Recommendation: Moderate Soil Condition',
-        description: isTa
+        description: (isTa
           ? 'மண் ஈரம் அல்லது நைட்ரஜன் அளவு சற்று குறைவாக உள்ளது. யூரியா (25 கிலோ/ஏக்கர்) இட்டு பாசனத்தை அதிகரிக்கவும்.'
-          : 'Soil moisture or Nitrogen levels are slightly lower than optimal target. Apply split dose Urea (25kg/Acre) and increase irrigation frequency.',
+          : 'Soil moisture or Nitrogen levels are slightly lower than optimal target. Apply split dose Urea (25kg/Acre) and increase irrigation frequency.') + (mlAddon ? `\n\n[Live ML Advice] ${mlAddon}` : ''),
         badge: isTa ? 'மிதமான நிலை' : 'Moderate',
         icon: 'warning',
         iconColor: '#EF6C00',
@@ -45,9 +56,9 @@ const AIAnalysis = () => {
     } else {
       return {
         title: isTa ? 'AI பரிந்துரை: அவசர மண் சிகிச்சை தேவை' : 'AI Recommendation: Critical Soil Warning',
-        description: isTa
+        description: (isTa
           ? 'மண் pH மற்றும் சத்து நிலைகள் மிகவும் குறைவாக உள்ளன! உடனடியாக ஜிப்சம்/சுண்ணாம்பு மற்றும் தொழு உரம் இடவும்.'
-          : 'Critical nutrient deficiency or pH imbalance detected! Apply soil conditioner (lime/gypsum) and organic compost immediately.',
+          : 'Critical nutrient deficiency or pH imbalance detected! Apply soil conditioner (lime/gypsum) and organic compost immediately.') + (mlAddon ? `\n\n[Live ML Advice] ${mlAddon}` : ''),
         badge: isTa ? 'அவசர நிலை' : 'Critical',
         icon: 'error',
         iconColor: '#C62828',
@@ -59,6 +70,12 @@ const AIAnalysis = () => {
   };
 
   const rec = getRecommendationDetails();
+
+  const activeConfidence = (mlResult?.cropConfidence !== null && mlResult?.cropConfidence !== undefined)
+    ? `${Math.round(mlResult.cropConfidence * 100)}%`
+    : ((mlResult?.fertilizerConfidence !== null && mlResult?.fertilizerConfidence !== undefined)
+      ? `${Math.round(mlResult.fertilizerConfidence * 100)}%`
+      : '96.5%');
 
   return (
     <div className="screen active" id="ai-screen">
@@ -90,7 +107,7 @@ const AIAnalysis = () => {
 
           <div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{dict.lblConf}</div>
-            <div style={{ fontWeight: '700', color: 'var(--primary-green)' }}>96.5%</div>
+            <div style={{ fontWeight: '700', color: 'var(--primary-green)' }}>{activeConfidence}</div>
           </div>
         </div>
       </div>

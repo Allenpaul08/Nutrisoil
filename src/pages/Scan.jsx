@@ -39,8 +39,8 @@ const Scan = () => {
     await analyzeSoilAI(sensorState);
 
     const summaryText = isTa
-      ? `மண் சுகாதார மதிப்பெண் <b>${sensorState.score}</b>.<br><br>மண் ஈரம்: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>நைட்ரஜன்: ${sensorState.nitrogen} mg/kg<br><br>பாஸ்பரஸ்: ${Math.round(sensorState.phosphorous)} mg/kg<br><br>பொட்டாசியம்: ${Math.round(sensorState.potassium)} mg/kg<br><br>வெப்பநிலை: ${sensorState.temperature}°C<br><br>மண் நல்ல நிலையில் உள்ளது.`
-      : `Soil Health Score: <b>${sensorState.score}</b><br><br>Moisture: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>Nitrogen: ${sensorState.nitrogen} mg/kg<br><br>Phosphorous: ${Math.round(sensorState.phosphorous)} mg/kg<br><br>Potassium: ${Math.round(sensorState.potassium)} mg/kg<br><br>Temperature: ${sensorState.temperature}°C<br><br>Soil condition is healthy.`;
+      ? `மண் சுகாதார மதிப்பெண் <b>${sensorState.score}</b>.<br><br>மண் ஈரம்: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>நைட்ரஜன்: ${sensorState.nitrogen} mg/kg<br><br>பாஸ்பரஸ்: ${Math.round(sensorState.phosphorus ?? sensorState.phosphorous ?? 0)} mg/kg<br><br>பொட்டாசியம்: ${Math.round(sensorState.potassium)} mg/kg<br><br>வெப்பநிலை: ${sensorState.temperature}°C<br><br>மண் நல்ல நிலையில் உள்ளது.`
+      : `Soil Health Score: <b>${sensorState.score}</b><br><br>Moisture: ${sensorState.moisture}%<br><br>pH: ${sensorState.ph}<br><br>Nitrogen: ${sensorState.nitrogen} mg/kg<br><br>Phosphorous: ${Math.round(sensorState.phosphorus ?? sensorState.phosphorous ?? 0)} mg/kg<br><br>Potassium: ${Math.round(sensorState.potassium)} mg/kg<br><br>Temperature: ${sensorState.temperature}°C<br><br>Soil condition is healthy.`;
 
     setAiSummary(summaryText);
     navigate('/ai');
@@ -87,7 +87,7 @@ const Scan = () => {
 
         <SensorCard
           title={dict.pTitleP}
-          value={Math.round(sensorState.phosphorous)}
+          value={Math.round(sensorState.phosphorus ?? sensorState.phosphorous ?? 0)}
           unit="mg/kg"
           icon="spa"
           iconBg="#FCE4EC"
@@ -153,8 +153,8 @@ const Scan = () => {
           </div>
           <input
             type="range"
-            min="40"
-            max="250"
+            min="0"
+            max="500"
             value={sensorState.nitrogen}
             onChange={handleNitrogenChange}
           />
@@ -163,13 +163,13 @@ const Scan = () => {
         <div className="slider-box">
           <div className="slider-row">
             <span>{dict.sldTitleP}</span>
-            <span className="slider-val-badge">{Math.round(sensorState.phosphorous)} mg/kg</span>
+            <span className="slider-val-badge">{Math.round(sensorState.phosphorus ?? sensorState.phosphorous ?? 0)} mg/kg</span>
           </div>
           <input
             type="range"
-            min="5"
-            max="100"
-            value={sensorState.phosphorous}
+            min="0"
+            max="600"
+            value={sensorState.phosphorus ?? sensorState.phosphorous ?? 0}
             onChange={handlePhosphorousChange}
           />
         </div>

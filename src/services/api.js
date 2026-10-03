@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base Axios instance configured for Flask Backend & ESP32 Live Gateway
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://10.156.163.207:5000/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -21,15 +21,21 @@ apiClient.interceptors.response.use(
   }
 );
 
-// 1. GET /sensor-data (ESP32 Live Sensor Stream)
+// 1. GET /sensor/latest (Raspberry Pi ESP32 Live Sensor Stream)
 export const fetchSensorData = async () => {
   try {
-    const data = await apiClient.get('/sensor-data');
-    return { success: true, data };
+    const data = await apiClient.get('/sensor/latest');
+
+    return {
+      success: true,
+      data: data.data
+    };
   } catch (error) {
+    console.warn('Failed to fetch live sensor data:', error.message);
+
     return {
       success: false,
-      error: 'Backend/ESP32 offline',
+      error: 'Raspberry Pi sensor backend offline',
       data: null
     };
   }
@@ -67,33 +73,34 @@ export const sendChatMessage = async (message, currentLang, sensorState) => {
   }
 };
 
-// 4. POST /crop-recommendation (Agronomic Crop Advisory)
+// 4. POST /ml/crop (Agronomic Crop Advisory)
 export const getCropRecommendations = async (sensorState) => {
   try {
-    const data = await apiClient.post('/crop-recommendation', sensorState);
+    const data = await apiClient.post('/ml/crop', sensorState);
     return { success: true, data };
   } catch (error) {
     return { success: false, data: null };
   }
 };
 
-// 5. POST /fertilizer (NPK Recipe & Fertilizer Advisory)
+// 5. POST /ml/fertilizer (NPK Recipe & Fertilizer Advisory)
 export const getFertilizerAdvice = async (sensorState) => {
   try {
-    const data = await apiClient.post('/fertilizer', sensorState);
+    const payload = { crop: sensorState?.crop || '', ...sensorState };
+    const data = await apiClient.post('/ml/fertilizer', payload);
     return { success: true, data };
   } catch (error) {
     return { success: false, data: null };
   }
 };
 
-// 6. POST /history (Scan Timeline Database)
+// 6. GET /sensor/history (Scan Timeline Database)
 export const getScanHistory = async () => {
   try {
-    const data = await apiClient.post('/history', {});
-    return { success: true, data };
+    const data = await apiClient.get('/sensor/history');
+    return { success: true, data: data?.data || data };
   } catch (error) {
-    return { success: false, data: null };
+    return { success: false, data: [] };
   }
 };
 

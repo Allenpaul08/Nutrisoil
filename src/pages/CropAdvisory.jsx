@@ -10,11 +10,11 @@ const CropAdvisory = () => {
 
   const formattedCropName = mlResult?.crop
     ? (isTa ? `${mlResult.crop} (ML)` : mlResult.crop.charAt(0).toUpperCase() + mlResult.crop.slice(1))
-    : (isTa ? 'நெல் (Paddy / Rice)' : 'Paddy (Rice)');
+    : (isTa ? 'பரிந்துரை பெறப்படுகிறது...' : 'Analyzing Soil Data...');
 
   const primaryMatchRate = (mlResult?.cropConfidence !== null && mlResult?.cropConfidence !== undefined)
     ? `${Math.round(mlResult.cropConfidence * 100)}% Match`
-    : '95% Match';
+    : (isTa ? 'கணக்கிடப்படுகிறது...' : 'Calculating...');
 
   return (
     <div className="screen active" id="crop-screen">

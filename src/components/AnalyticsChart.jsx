@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useHardware } from '../context/HardwareContext';
+import { getScanHistory } from '../services/api';
 import {
   ResponsiveContainer,
   LineChart,
@@ -14,70 +15,86 @@ import {
 const AnalyticsChart = () => {
   const { dict, isTa } = useLanguage();
   const { sensorState } = useHardware();
+  const [historyRecords, setHistoryRecords] = useState([]);
 
-  const currentScore      = parseFloat(sensorState.score)       || 84.5;
-  const currentMoisture   = parseFloat(sensorState.moisture)    || 52.0;
-  const currentPh         = parseFloat(sensorState.ph)          || 6.8;
-  const currentNitrogen   = parseFloat(sensorState.nitrogen)    || 135;
-  const currentPhosphor   = parseFloat(sensorState.phosphorous) || 45;
-  const currentPotassium  = parseFloat(sensorState.potassium)   || 120;
-  const currentTemp       = parseFloat(sensorState.temperature) || 28.5;
+  useEffect(() => {
+    let isMounted = true;
 
-  const healthData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 72 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 78.5 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 81 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 75 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentScore }
-  ];
+    const fetchHistory = async () => {
+      try {
+        const res = await getScanHistory();
+        if (!isMounted) return;
 
-  const moistureData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 45 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 48 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 50 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 51 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentMoisture }
-  ];
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          // Slice latest 10 records and reverse for chronological timeline
+          const sliced = res.data.slice(0, 10).reverse();
+          setHistoryRecords(sliced);
+        }
+      } catch (err) {
+        console.warn('[AnalyticsChart] History fetch error:', err);
+      }
+    };
 
-  const phData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 6.2 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 6.4 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 6.6 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 6.7 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentPh }
-  ];
+    fetchHistory();
 
-  const nitrogenData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 110 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 120 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 128 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 130 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentNitrogen }
-  ];
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const phosphorousData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 30 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 35 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 38 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 42 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentPhosphor }
-  ];
+  const currentScore      = parseFloat(sensorState.score)                             || 84.5;
+  const currentMoisture   = parseFloat(sensorState.moisture)                          || 0;
+  const currentPh         = parseFloat(sensorState.ph)                                || 7.0;
+  const currentNitrogen   = parseFloat(sensorState.nitrogen)                          || 0;
+  const currentPhosphor   = parseFloat(sensorState.phosphorus ?? sensorState.phosphorous) || 0;
+  const currentPotassium  = parseFloat(sensorState.potassium)                         || 0;
+  const currentTemp       = parseFloat(sensorState.temperature)                       || 0;
 
-  const potassiumData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 95 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 102 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 108 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 115 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentPotassium }
-  ];
+  const hasHistory = historyRecords.length > 0;
 
-  const temperatureData = [
-    { name: isTa ? 'வாரம் 1' : 'Week 1', value: 26.0 },
-    { name: isTa ? 'வாரம் 2' : 'Week 2', value: 27.0 },
-    { name: isTa ? 'வாரம் 3' : 'Week 3', value: 27.5 },
-    { name: isTa ? 'வாரம் 4' : 'Week 4', value: 28.0 },
-    { name: isTa ? 'இன்று' : 'Today', value: currentTemp }
-  ];
+  const formatTime = (ts, id) => {
+    if (!ts) return `#${id || ''}`;
+    const parts = ts.split(' ');
+    return parts[1] ? parts[1].slice(0, 5) : ts.slice(-5);
+  };
+
+  const healthData = hasHistory
+    ? historyRecords.map((r) => {
+        let sc = 100.0;
+        const phVal = parseFloat(r.ph) || 7.0;
+        const mVal = parseFloat(r.moisture) || 0;
+        const nVal = parseFloat(r.nitrogen) || 0;
+        if (phVal < 6.0) sc -= (6.0 - phVal) * 15.0;
+        if (phVal > 7.5) sc -= (phVal - 7.5) * 15.0;
+        if (mVal < 40) sc -= (40 - mVal) * 0.8;
+        if (nVal < 120) sc -= (120 - nVal) * 0.2;
+        return { name: formatTime(r.timestamp, r.id), value: parseFloat(Math.max(10, Math.min(99, sc)).toFixed(1)) };
+      })
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentScore }];
+
+  const moistureData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.moisture) || 0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentMoisture }];
+
+  const phData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.ph) || 7.0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentPh }];
+
+  const nitrogenData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.nitrogen) || 0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentNitrogen }];
+
+  const phosphorousData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.phosphorus ?? r.phosphorous) || 0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentPhosphor }];
+
+  const potassiumData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.potassium) || 0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentPotassium }];
+
+  const temperatureData = hasHistory
+    ? historyRecords.map((r) => ({ name: formatTime(r.timestamp, r.id), value: parseFloat(r.temperature) || 0 }))
+    : [{ name: isTa ? 'இன்று' : 'Today', value: currentTemp }];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -91,7 +108,7 @@ const AnalyticsChart = () => {
             <LineChart data={healthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E8F5E9" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[50, 100]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -125,7 +142,7 @@ const AnalyticsChart = () => {
             <LineChart data={moistureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E3F2FD" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[20, 80]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -157,7 +174,7 @@ const AnalyticsChart = () => {
             <LineChart data={phData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F3E5F5" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[4.0, 9.0]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -189,7 +206,7 @@ const AnalyticsChart = () => {
             <LineChart data={nitrogenData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E8F5E9" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[50, 250]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -221,7 +238,7 @@ const AnalyticsChart = () => {
             <LineChart data={phosphorousData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#FCE4EC" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[10, 100]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -253,7 +270,7 @@ const AnalyticsChart = () => {
             <LineChart data={potassiumData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E8EAF6" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[50, 300]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
@@ -285,7 +302,7 @@ const AnalyticsChart = () => {
             <LineChart data={temperatureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#FFF8E1" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} />
-              <YAxis domain={[15, 45]} tick={{ fontSize: 11, fill: '#6B7280' }} />
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#6B7280' }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
