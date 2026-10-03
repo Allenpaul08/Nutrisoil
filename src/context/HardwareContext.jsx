@@ -43,17 +43,21 @@ export const HardwareProvider = ({ children }) => {
 
         if (!isMounted) return;
 
-        if (cropRes && cropRes.success && fertRes && fertRes.success) {
-          const cropData = cropRes.data || {};
-          const fertData = fertRes.data || {};
+        if ((cropRes && cropRes.success) || (fertRes && fertRes.success)) {
+          const cropData = cropRes?.data || {};
+          const fertData = fertRes?.data || {};
 
-          setMlResult({
-            crop: cropData.crop || cropData.recommended_crop || cropData.prediction || null,
-            cropConfidence: cropData.cropConfidence || cropData.confidence || cropData.probability || null,
-            fertilizer: fertData.fertilizer || fertData.recommended_fertilizer || fertData.prediction || null,
-            fertilizerConfidence: fertData.fertilizerConfidence || fertData.confidence || fertData.probability || null,
-            fertilizerPath: fertData.fertilizerPath || fertData.path || fertData.recommendation_path || null
-          });
+          setMlResult((prev) => ({
+            crop: cropData.crop || cropData.recommended_crop || cropData.prediction || prev.crop,
+            cropConfidence: (cropData.cropConfidence !== undefined && cropData.cropConfidence !== null)
+              ? cropData.cropConfidence
+              : ((cropData.confidence !== undefined && cropData.confidence !== null) ? cropData.confidence : (cropData.probability ?? prev.cropConfidence)),
+            fertilizer: fertData.fertilizer || fertData.recommended_fertilizer || fertData.prediction || prev.fertilizer,
+            fertilizerConfidence: (fertData.fertilizerConfidence !== undefined && fertData.fertilizerConfidence !== null)
+              ? fertData.fertilizerConfidence
+              : ((fertData.confidence !== undefined && fertData.confidence !== null) ? fertData.confidence : (fertData.probability ?? prev.fertilizerConfidence)),
+            fertilizerPath: fertData.fertilizerPath || fertData.path || fertData.recommendation_path || fertData.recommendation_mode || prev.fertilizerPath
+          }));
         }
       } catch (error) {
         console.error('[HardwareContext] ML recommendation fetch error:', error);

@@ -20,6 +20,10 @@ function buildSystemPrompt(sensorState, mlResult) {
 ===
 `;
 
+  const formattedCrop = mlResult?.crop
+    ? mlResult.crop.charAt(0).toUpperCase() + mlResult.crop.slice(1)
+    : 'N/A';
+
   const cropConfStr = (mlResult?.cropConfidence !== null && mlResult?.cropConfidence !== undefined)
     ? `${Math.round(mlResult.cropConfidence * 100)}%`
     : 'N/A';
@@ -29,15 +33,18 @@ function buildSystemPrompt(sensorState, mlResult) {
     : 'N/A';
 
   let pathModeStr = 'N/A';
-  if (mlResult?.fertilizerPath === 'crop-aware') {
+  const pathVal = (mlResult?.fertilizerPath || '').toLowerCase();
+  if (pathVal.includes('crop-aware') || pathVal.includes('path a')) {
     pathModeStr = 'Path A: Crop-Aware Model';
-  } else if (mlResult?.fertilizerPath === 'soil-only') {
+  } else if (pathVal.includes('soil-only') || pathVal.includes('path b') || pathVal.includes('soil_only')) {
     pathModeStr = 'Path B: Soil-Only Model';
+  } else if (mlResult?.fertilizerPath) {
+    pathModeStr = mlResult.fertilizerPath;
   }
 
   const mlContext = `
 === CURRENT REAL-TIME ML PREDICTIONS ===
-- Recommended Crop: ${mlResult?.crop ?? 'N/A'}
+- Recommended Crop: ${formattedCrop}
 - Crop Confidence: ${cropConfStr}
 - Recommended Fertilizer: ${mlResult?.fertilizer ?? 'N/A'}
 - Fertilizer Confidence: ${fertConfStr}
@@ -70,12 +77,20 @@ CRITICAL LANGUAGE RULES:
 
 RESPONSE RULES:
 - Be concise, warm, and practical — farmers need actionable advice
-- Always use the CURRENT LIVE SENSOR READINGS above when answering soil/crop/fertilizer questions
-- Lead with the most important recommendation first
-- Use emojis sparingly to make responses friendly
-- Format with line breaks for readability — avoid long paragraphs
-- When recommending crops or fertilizers, explain WHY based on current sensor values; distinguish statistical ML model outputs from agronomic causal explanations
-- Keep voice-friendly responses under 100 words when possible`;
+- STRICT GROUNDING & PRIORITY: Live values in === CURRENT REAL-TIME ML PREDICTIONS === and === CURRENT LIVE SENSOR READINGS === ALWAYS take precedence over static demo text or knowledge-base examples.
+- NEVER state that Paddy, Paddy (Samba), Thanjavur, or any demo setting is the user's current crop, location, or region unless explicitly present in live context or asked by the user. Do not invent local market demand or soil suitability claims.
+- ALWAYS use exact live values from === CURRENT REAL-TIME ML PREDICTIONS === (e.g. Recommended Crop: ${formattedCrop}, Confidence: ${cropConfStr}, Recommended Fertilizer: ${mlResult?.fertilizer ?? 'N/A'}, Confidence: ${fertConfStr}, Path: ${pathModeStr}).
+- If Recommended Crop or Recommended Fertilizer is N/A, clearly state that the ML prediction is currently unavailable instead of fabricating values.
+- CLEARLY DISTINGUISH:
+  1. ML Statistical Prediction (pattern-matching output from trained dataset)
+  2. Current Live Sensor Readings (real-time soil parameters)
+  3. General Agronomic Knowledge (general crop/fertilizer management advice)
+- EXPLAINING PREDICTIONS: State that the ML model recommended the crop based on feature pattern matching from its training dataset for the current live sensor readings. Do NOT invent unsupported causal rules.
+- FERTILIZER ADVICE: Report the exact live ML fertilizer, confidence percentage, and path mode (Path A Crop-Aware / Path B Soil-Only).
+- Lead with the most important recommendation first.
+- Use emojis sparingly to make responses friendly.
+- Format with line breaks for readability — avoid long paragraphs.
+- Keep voice-friendly responses under 100 words when possible.`;
 }
 
 /**

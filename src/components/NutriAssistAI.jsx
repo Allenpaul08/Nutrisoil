@@ -82,7 +82,7 @@ function friendlyError(err, isTa) {
    COMPONENT
 ═══════════════════════════════════════════════════════ */
 export default function NutriAssistAI() {
-  const { sensorState }           = useHardware();
+  const { sensorState, mlResult } = useHardware();
   const [isOpen,   setIsOpen]     = useState(false);
   const [lang,     setLang]       = useState('en');   // 'en' | 'ta'
   const [messages, setMessages]   = useState([]);
@@ -308,7 +308,7 @@ export default function NutriAssistAI() {
       // Build history for Groq (current messages minus the one we just added)
       const history = messages.filter(m => m.sender === 'user' || m.sender === 'bot');
 
-      const reply = await sendGroqMessage(trimmed, sensorState, history, key);
+      const reply = await sendGroqMessage(trimmed, sensorState, history, key, mlResult);
 
       setIsThinking(false);
       addMsg('bot', reply);

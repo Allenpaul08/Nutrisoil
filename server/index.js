@@ -127,9 +127,7 @@ app.post('/api/chat', async (req, res) => {
     temperature: 0.7,
     max_tokens: 512,
     top_p: 0.8,
-    stream: false,
-    reasoning_effort: 'none',
-    reasoning_format: 'hidden'
+    stream: false
   };
 
   let groqRes;
