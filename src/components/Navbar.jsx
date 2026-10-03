@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useHardware } from '../context/HardwareContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
 // Static notification metadata (icons, colors, unread state, id)
-// Titles, messages and times come from dict — auto-switch with language
 const NOTIF_META = [
-  { id: 1, icon: 'warning',    iconColor: '#E65100', iconBg: '#FFF3E0', unread: true,  titleKey: 'notif1Title', msgKey: 'notif1Msg', timeKey: 'notif1Time' },
-  { id: 2, icon: 'eco',        iconColor: '#2E7D32', iconBg: '#E8F5E9', unread: true,  titleKey: 'notif2Title', msgKey: 'notif2Msg', timeKey: 'notif2Time' },
-  { id: 3, icon: 'thermostat', iconColor: '#F57F17', iconBg: '#FFF8E1', unread: false, titleKey: 'notif3Title', msgKey: 'notif3Msg', timeKey: 'notif3Time' },
-  { id: 4, icon: 'spa',        iconColor: '#C62828', iconBg: '#FCE4EC', unread: false, titleKey: 'notif4Title', msgKey: 'notif4Msg', timeKey: 'notif4Time' },
+  { id: 1, icon: 'warning',    iconColor: '#E65100', iconBg: '#FFF3E0', unread: true },
+  { id: 2, icon: 'eco',        iconColor: '#2E7D32', iconBg: '#E8F5E9', unread: true },
+  { id: 3, icon: 'thermostat', iconColor: '#F57F17', iconBg: '#FFF8E1', unread: false },
+  { id: 4, icon: 'spa',        iconColor: '#C62828', iconBg: '#FCE4EC', unread: false },
 ];
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dict } = useLanguage();
+  const { dict, isTa } = useLanguage();
+  const { sensorState, mlResult } = useHardware();
 
   const [notifOpen, setNotifOpen] = useState(false);
   // Track dismissed ids and read ids separately so language switch works
@@ -24,16 +25,60 @@ const Navbar = () => {
 
   const isHome = location.pathname === '/';
 
-  // Build live notifications by merging meta with dict text
+  const moistVal = parseFloat(sensorState?.moisture ?? 0).toFixed(1);
+  const nVal = Math.round(sensorState?.nitrogen ?? 0);
+  const pVal = Math.round(sensorState?.phosphorus ?? sensorState?.phosphorous ?? 0);
+  const kVal = Math.round(sensorState?.potassium ?? 0);
+  const tempVal = parseFloat(sensorState?.temperature ?? 0).toFixed(1);
+
+  const getDynamicNotif = (id) => {
+    switch (id) {
+      case 1:
+        return {
+          title: isTa ? (parseFloat(moistVal) < 30 ? 'மண் ஈரம் குறைவு' : 'மண் ஈரம் நிலை') : (parseFloat(moistVal) < 30 ? 'Low Soil Moisture' : 'Soil Moisture Status'),
+          message: parseFloat(moistVal) < 30
+            ? (isTa ? `ஈரம் ${moistVal}% ஆக உள்ளது — விரைவில் நீர்ப்பாசனம் செய்யுங்கள்.` : `Moisture at ${moistVal}% — consider irrigation soon.`)
+            : (isTa ? `ஈரம் ${moistVal}% ஆக உள்ளது — போதுமான ஈரப்பதம்.` : `Moisture level is ${moistVal}% — adequate soil moisture.`),
+          time: isTa ? '2 நிமிடம் முன்' : '2 min ago'
+        };
+      case 2:
+        return {
+          title: isTa ? 'நைட்ரஜன் நிலை' : 'Nitrogen Level',
+          message: isTa ? `N அளவு ${nVal} mg/kg — நேரலை அளவீடு.` : `N level is ${nVal} mg/kg — live reading.`,
+          time: isTa ? '1 மணி முன்' : '1 hr ago'
+        };
+      case 3:
+        return {
+          title: isTa ? 'மண் வெப்பநிலை எச்சரிக்கை' : 'Soil Temperature',
+          message: mlResult?.crop
+            ? (isTa ? `வெப்பநிலை ${tempVal}°C — ${mlResult.crop} பயிர் வளர்ச்சிக்கு நேரலை சூழல்.` : `Temperature at ${tempVal}°C — live environment for ${mlResult.crop.charAt(0).toUpperCase() + mlResult.crop.slice(1)}.`)
+            : (isTa ? `வெப்பநிலை ${tempVal}°C — நேரலை மண் வெப்பநிலை.` : `Temperature at ${tempVal}°C — current soil temperature.`),
+          time: isTa ? '3 மணி முன்' : '3 hr ago'
+        };
+      case 4:
+        return {
+          title: isTa ? 'பாஸ்பரஸ் & பொட்டாசியம் சரிபார்ப்பு' : 'Phosphorous & Potassium Status',
+          message: isTa ? `P அளவு ${pVal} mg/kg, K அளவு ${kVal} mg/kg — நேரலை அளவீடுகள்.` : `P level at ${pVal} mg/kg, K level at ${kVal} mg/kg — live readings.`,
+          time: isTa ? 'நேற்று' : 'Yesterday'
+        };
+      default:
+        return { title: '', message: '', time: '' };
+    }
+  };
+
+  // Build live notifications by merging meta with dynamic sensor text
   const notifications = NOTIF_META
     .filter((n) => !dismissedIds.includes(n.id))
-    .map((n) => ({
-      ...n,
-      title:   dict[n.titleKey] || n.titleKey,
-      message: dict[n.msgKey]   || n.msgKey,
-      time:    dict[n.timeKey]  || n.timeKey,
-      unread:  n.unread && !readIds.includes(n.id),
-    }));
+    .map((n) => {
+      const dyn = getDynamicNotif(n.id);
+      return {
+        ...n,
+        title: dyn.title,
+        message: dyn.message,
+        time: dyn.time,
+        unread: n.unread && !readIds.includes(n.id),
+      };
+    });
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
